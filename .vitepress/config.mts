@@ -38,35 +38,35 @@ export default defineConfig({
       {
         text: "主页",
         items: [
-          { text: "介绍", link: "/markdown-examples" },
-          { text: "示例", link: "/markdown-examples" },
+          { text: "介绍", link: "/doc/markdown-examples" },
+          { text: "示例", link: "/doc/markdown-examples" },
         ],
       },
-      { text: "博客", link: "/my-blog" },
-      { text: "前端", link: "/front-end/react" },
-      { text: "后端", link: "/backend/rabbitmq" },
-      { text: "源码", link: "/source-code" },
-      { text: "教程", link: "/course" },
-      { text: "其他", link: "/other" },
+      { text: "博客", link: "/doc/my-blog" },
+      { text: "前端", link: "/doc/front-end" },
+      { text: "后端", link: "/doc/backend" },
+      { text: "源码", link: "/doc/source-code" },
+      { text: "教程", link: "/doc/course" },
+      { text: "其他", link: "/doc/other" },
     ],
 
     sidebar: {
-      "/front-end/react": set_sidebar("/front-end/react/"),
-      "/backend/rabbitmq": set_sidebar("/backend/rabbitmq/"),
+      "/front-end": set_sidebar("/doc/front-end"),
+      "/backend": set_sidebar("/doc/backend"),
     },
     // sidebar: [
     //   {
     //     text: "Examples",
     //     items: [
-    //       { text: "Markdown Examples", link: "/markdown-examples" },
-    //       { text: "Runtime API Examples", link: "/api-examples" }
+    //       { text: "Markdown Examples", link: "/doc/markdown-examples" },
+    //       { text: "Runtime API Examples", link: "/doc/api-examples" }
     //     ],
     //   },
     //   {
     //     text: "Examples2",
     //     items: [
-    //       { text: "Markdown Examples", link: "/markdown-examples" },
-    //       { text: "Runtime API Examples", link: "/api-examples" }
+    //       { text: "Markdown Examples", link: "/doc/markdown-examples" },
+    //       { text: "Runtime API Examples", link: "/doc/api-examples" }
     //     ],
     //   },
     // ],
