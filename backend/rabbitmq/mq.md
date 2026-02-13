@@ -49,11 +49,8 @@ RabbitMQ 是一个开源的消息代理（Message Broker），实现了高级消
 
 ```bash
 # Docker 方式（推荐）
-docker run -d -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
 # 访问管理界面
-# http://localhost:15672
-# 默认账号：guest / guest
 ```
 
 ### 4.2 Java 示例（Spring Boot）
@@ -157,7 +154,7 @@ public void handleMessage(Message message, Channel channel) throws IOException {
 
 ## 7. 监控与运维
 
-- 管理界面：http://localhost:15672
+- 管理界面：
 - 常用指标：队列长度、消息速率、消费者数量
 - 日志路径：`/var/log/rabbitmq/`（Linux）
 
