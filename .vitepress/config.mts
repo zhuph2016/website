@@ -3,8 +3,8 @@ import { set_sidebar } from "./utils/auto_sidebar.mjs"; // 改成自己的路径
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base:'/website/',
-  head: [["link", { rel: "icon", href: "/logo.jpg" }]],
+  base: "/website/",
+  head: [["link", { rel: "icon", href: "/website/logo.jpg" }]],
   title: "行走江湖的个人网站",
   description: "A VitePress Site",
   themeConfig: {
@@ -38,14 +38,16 @@ export default defineConfig({
       {
         text: "主页",
         items: [
-          { text: "个人介绍", link: "/markdown-examples" },
-          { text: "我的博客", link: "/my-blog" },
+          { text: "介绍", link: "/markdown-examples" },
+          { text: "示例", link: "/markdown-examples" },
         ],
       },
-      { text: "示例", link: "/markdown-examples" },
+      { text: "博客", link: "/my-blog" },
       { text: "前端", link: "/front-end/react" },
       { text: "后端", link: "/backend/rabbitmq" },
-      { text: "两边栏", link: "/两边栏" },
+      { text: "源码", link: "/source-code" },
+      { text: "教程", link: "/course" },
+      { text: "其他", link: "/other" },
     ],
 
     sidebar: {
@@ -71,6 +73,7 @@ export default defineConfig({
 
     socialLinks: [
       { icon: "github", link: "https://github.com/zhuph2016/website" },
+      { icon: "gitee", link: "https://github.com/zhuph2016/website" },
     ],
     // 底部配置
     footer: {
