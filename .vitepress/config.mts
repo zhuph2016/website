@@ -3,6 +3,7 @@ import { set_sidebar } from "./utils/auto_sidebar.mjs"; // 改成自己的路径
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base:'/website/',
   head: [["link", { rel: "icon", href: "/logo.jpg" }]],
   title: "行走江湖的个人网站",
   description: "A VitePress Site",
