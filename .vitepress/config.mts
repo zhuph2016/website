@@ -35,8 +35,9 @@ export default defineConfig({
       },
     },
     nav: [
+      {text: "主页",link: "/index" },
       {
-        text: "主页",
+        text: "个人",
         items: [
           { text: "介绍", link: "/doc/markdown-examples" },
           { text: "示例", link: "/doc/markdown-examples" },
@@ -49,7 +50,6 @@ export default defineConfig({
       { text: "教程", link: "/doc/course" },
       { text: "其他", link: "/doc/other" },
     ],
-
     sidebar: {
       "/front-end": set_sidebar("/doc/front-end"),
       "/backend": set_sidebar("/doc/backend"),
