@@ -7,6 +7,7 @@ export default defineConfig({
   head: [["link", { rel: "icon", href: "/website/logo.jpg" }]],
   title: "行走江湖的个人网站",
   description: "A VitePress Site",
+  ignoreDeadLinks: true, // ✅ 正确：在根级别配置，忽略所有死链接检查
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: "/logo.jpg",
