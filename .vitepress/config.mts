@@ -1,20 +1,24 @@
 import { defineConfig } from "vitepress";
-import { set_sidebar } from "./utils/auto_sidebar.mjs"; // 改成自己的路径
+// 改成自己的路径
+import { set_sidebar } from "./utils/auto_sidebar.mjs";
 
-// https://vitepress.dev/reference/site-config
+// 配置 https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: "/website/",
   head: [["link", { rel: "icon", href: "/website/logo.jpg" }]],
   title: "行走江湖的个人网站",
   description: "A VitePress Site",
-  ignoreDeadLinks: true, // ✅ 正确：在根级别配置，忽略所有死链接检查
+  // 在根级别配置，忽略所有死链接检查
+  ignoreDeadLinks: true,
+  // https://vitepress.dev/reference/default-theme-config
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
     logo: "/logo.jpg",
     outlineTitle: "文章目录",
     outline: [2, 6],
-    // sidebar: false, // 关闭侧边栏
-    aside: "left", // 设置右侧侧边栏在左侧显示
+    // 关闭侧边栏
+    // sidebar: false,
+    // 设置右侧侧边栏在左侧显示
+    aside: "left",
     // 设置搜索框的样式
     search: {
       provider: "local",
@@ -36,19 +40,34 @@ export default defineConfig({
       },
     },
     nav: [
-      {text: "主页",link: "/index" },
+      { text: "主页", link: "/index" },
       {
-        text: "个人",
+        text: "热点",
         items: [
-          { text: "介绍", link: "/doc/markdown-examples" },
-          { text: "示例", link: "/doc/markdown-examples" },
+          { text: "Ai", link: "/doc/ai" },
+          { text: "博客", link: "/doc/my-blog" },
         ],
       },
-      { text: "博客", link: "/doc/my-blog" },
+      { text: "面试", link: "/doc/interview" },
       { text: "前端", link: "/doc/front-end" },
       { text: "后端", link: "/doc/backend" },
       { text: "源码", link: "/doc/source-code" },
-      { text: "教程", link: "/doc/course" },
+      // { text: "教程", link: "/doc/course" },
+      {
+        text: "教程",
+        items: [
+          { text: "若依ruoyi", link: "https://doc.ruoyi.vip/" },
+          {
+            text: "芋道yudao",
+            items: [
+              { text: "ruoyi-vue-pro", link: "https://doc.iocoder.cn/" },
+              { text: "yudao-cloud", link: "https://cloud.iocoder.cn/" },
+            ],
+          },
+          { text: "马士兵", link: "https://www.mashibing.com/sf/pc.html" },
+          { text: "mall", link: "https://www.macrozheng.com/" },
+        ],
+      },
       { text: "其他", link: "/doc/other" },
     ],
     sidebar: {

@@ -3,29 +3,33 @@
 layout: home
 
 hero:
-  name: "足球之家"
-  text: "个人站点"
-  tagline: Excelsior 精进不休
+  name: 足球之家
+  text: Excelsior
+  tagline: 打造具有个人兴趣爱好的产品生态
   image:
     src: /background.png
     alt: 背景图片
   actions:
     - theme: brand
-      text: Markdown 示例
-      link: /doc/markdown-examples
+      text: football-home
+      link: /doc/football-home
     - theme: alt
-      text: API 示例
-      link: /doc/api-examples
+      text: football-home-cloud
+      link: /doc/football-home-cloud
 
 features:
-  - title: 企鹅外卖
+  - title: 外卖系统
     details: 根据苍穹外卖搭建属于自己的学习框架
     link: /doc/zhuph-take-out
-    icon: 📦
-  - title: Feature B
-    details: 特征B的详情描述特征B的详情描述特征B的详情描述特征B的详情描述特征B的详情描述特征B的详情描述
-  - title: Feature C
-    details: 特征C的详情描述特征C的详情描述特征C的详情描述特征C的详情描述特征C的详情描述特征C的详情描述
+    icon: 🥡
+  - title: 点评系统
+    details: 根据黑马点评搭建属于自己的学习框架
+    link: /doc/zhuph-dianping
+    icon: 🌟  
+  - title: 商城系统
+    details: 根据macro的开源项目mall搭建属于自己的学习框架
+    link: /doc/zhuph-mall
+    icon: 🏬
   - title: Feature D
     details: 特征D的详情描述特征D的详情描述特征D的详情描述特征D的详情描述特征D的详情描述特征D的详情描述
   - title: Feature E
