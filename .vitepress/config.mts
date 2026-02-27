@@ -14,7 +14,7 @@ export default defineConfig({
   themeConfig: {
     logo: "/logo.jpg",
     outlineTitle: "文章目录",
-    outline: [2, 6],
+    outline: [1, 6],
     // 关闭侧边栏
     // sidebar: false,
     // 设置右侧侧边栏在左侧显示
@@ -41,18 +41,10 @@ export default defineConfig({
     },
     nav: [
       { text: "主页", link: "/index" },
-      {
-        text: "热点",
-        items: [
-          { text: "Ai", link: "/doc/ai" },
-          { text: "博客", link: "/doc/my-blog" },
-        ],
-      },
       { text: "面试", link: "/doc/interview" },
-      { text: "前端", link: "/doc/front-end" },
-      { text: "后端", link: "/doc/backend" },
+      { text: "前端", link: "/doc/frontend/" },
+      { text: "后端", link: "/doc/backend/" },
       { text: "源码", link: "/doc/source-code" },
-      // { text: "教程", link: "/doc/course" },
       {
         text: "教程",
         items: [
@@ -68,11 +60,17 @@ export default defineConfig({
           { text: "mall", link: "https://www.macrozheng.com/" },
         ],
       },
-      { text: "其他", link: "/doc/other" },
+      {
+        text: "其他",
+        items: [
+          { text: "Ai", link: "/doc/hot/ai" },
+          { text: "博客", link: "/doc/hot/blog" },
+        ],
+      },
     ],
     sidebar: {
-      "/front-end": set_sidebar("/doc/front-end"),
-      "/backend": set_sidebar("/doc/backend"),
+      "/doc/frontend": set_sidebar("/doc/frontend/"),
+      "/doc/backend": set_sidebar("/doc/backend/"),
     },
     // sidebar: [
     //   {
@@ -93,7 +91,7 @@ export default defineConfig({
 
     socialLinks: [
       { icon: "github", link: "https://github.com/zhuph2016/website" },
-      { icon: "gitee", link: "https://github.com/zhuph2016/website" },
+      { icon: "gitee", link: "https://gitee.com/zhuph2016/website" },
     ],
     // 底部配置
     footer: {
