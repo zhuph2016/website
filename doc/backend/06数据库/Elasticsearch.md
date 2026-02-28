@@ -1,4 +1,4 @@
-# Elasticsearch 快速入门
+# Elasticsearch
 ## 1. 核心概念
 - **索引(Index)**：类似数据库中的"数据库"，用于存储一类相关文档
 - **文档(Document)**：类似数据库中的"行/记录"，JSON 格式的数据单元

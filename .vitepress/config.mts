@@ -40,11 +40,10 @@ export default defineConfig({
       },
     },
     nav: [
-      { text: "主页", link: "/index" },
+      { text: "首页", link: "/index" },
+      { text: "前端", link: "/doc/frontend" },
+      { text: "后端", link: "/doc/backend" },
       { text: "面试", link: "/doc/interview" },
-      { text: "前端", link: "/doc/frontend/" },
-      { text: "后端", link: "/doc/backend/" },
-      { text: "源码", link: "/doc/source-code" },
       {
         text: "教程",
         items: [
@@ -63,8 +62,10 @@ export default defineConfig({
       {
         text: "其他",
         items: [
-          { text: "Ai", link: "/doc/hot/ai" },
-          { text: "博客", link: "/doc/hot/blog" },
+          { text: "Ai", link: "/doc/other/ai" },
+          { text: "源码", link: "/doc/source-code" },
+          { text: "博客", link: "/doc/other/blog" },
+          { text: "算法", link: "/doc/other/DataStructuresAlgorithms" },
         ],
       },
     ],
