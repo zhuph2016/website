@@ -5,14 +5,14 @@ import { set_sidebar } from "./utils/auto_sidebar.mjs";
 // 配置 https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: "/website/",
-  head: [["link", { rel: "icon", href: "/public/images/logo.jpg" }]],
+  head: [["link", { rel: "icon", href: "/images/logo.jpg" }]],
   title: "行走江湖的个人网站",
   description: "A VitePress Site",
   // 在根级别配置，忽略所有死链接检查
   ignoreDeadLinks: true,
   // https://vitepress.dev/reference/default-theme-config
   themeConfig: {
-    logo: "/public/images/logo.jpg",
+    logo: "/images/logo.jpg",
     outlineTitle: "文章目录",
     outline: [1, 6],
     // 关闭侧边栏
