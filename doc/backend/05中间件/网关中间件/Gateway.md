@@ -1,1 +1,0 @@
-https://springdoc.cn/spring-cloud-gateway/
