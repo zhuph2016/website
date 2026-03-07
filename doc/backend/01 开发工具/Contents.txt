@@ -1,0 +1,7 @@
+操作系统：Windows macOS Linux（WSL2）
+JDK：安装、环境变量、多版本管理（jenvsdkman）、镜像源
+IDE：IntelliJ IDEA（安装、激活  许可、插件、快捷键、代码模板、格式化）
+构建工具：Maven  Gradle（安装、镜像、settings.xml、依赖管理、私服 Nexus）
+代码质量：SonarLintSonarQube、Checkstyle、PMD、SpotBugs
+终端 & Shell：iTerm2、Oh My Zsh、常用命令、脚本基础
+Git：安装、配置、常用操作、Git Flow、冲突解决、.gitignore
