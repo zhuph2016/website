@@ -1,3 +1,7 @@
+​	软件开发的工具众多，给人的感觉总是“工欲善其事，必先利其器”。除此之外软件等相关工具的资源寻找、安装、使用等相关疑难杂症总是特别耗时的，私以为这些工作是不需要思考的，同时也想整理一下这些资源，以备需要的时候同样的坑再踩一次。
+
+​	软件开发的工具众多，给人的感觉总是“工欲善其事，必先利其器”。除此之外软件等相关工具的资源寻找、安装、使用等相关疑难杂症总是特别耗时的，私以为这些工作是不需要思考的，同时也想整理一下这些资源，以备需要的时候同样的坑再踩一次。
+
 # **电脑设置**
 
 ## **护眼配置**
@@ -104,12 +108,17 @@ C:\Users\Zhuph\.ssh\id_rsa.pub
 #### **账户信息**
 
 ### 查看git的全局配置
+
 git config --global --list
 
 ### 仓库配置
+
 ### 配置用户名
+
 git config --global user.name "zhuph"
+
 ### 配置邮箱 
+
 git config --global user.email "zhuph@qq.com.cn"
 
 ##生存秘钥对
@@ -443,13 +452,15 @@ under the License.
 
 ```
 C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+
 ```
 
 **3. 连接客户端问题**
 
 mysql8 之前的版本中加密规则是mysql_native_password,而在mysql8之后,加密规则是caching_sha2_password
 
-![1680268168139](./BaseNote.assets/1680268168139.png)
+![1680268168139](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1680268168139.png)
 
 修改加密规则
 
@@ -476,6 +487,8 @@ FLUSH PRIVILEGES;
 alter user 'root'@'localhost' identified by 'root';
 
 此处将密码改为root
+
+
 ```
 
 
@@ -522,9 +535,9 @@ npm config set cache "D:\03Repository\node_modules\npm\node_cache"
 
 
 
-![1642242052212](./BaseNote.assets/1642242052212.png)
+![1642242052212](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1642242052212.png)
 
-![1642242233517](./BaseNote.assets/1642242233517.png)
+![1642242233517](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1642242233517.png)
 
 https://localhost:1158/em
 
@@ -576,11 +589,11 @@ https://redis.io/insight/
 
 ## 1. VMware
 
-![1645236143481](./BaseNote.assets/1645236143481.png)
+![1645236143481](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1645236143481.png)
 
-![1645236474469](./BaseNote.assets/1645236474469.png)
+![1645236474469](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1645236474469.png)
 
-![1645236663553](./BaseNote.assets/1645236663553.png)
+![1645236663553](../01%20%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/ToolNote.assets/1645236663553.png)
 
   2
 
