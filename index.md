@@ -7,7 +7,7 @@ hero:
   text: Excelsior
   tagline: 打造贴合个人兴趣的生态产品
   image:
-    src: /background.png
+    src: /public/images/background.png
     alt: 背景图片
   actions:
     - theme: brand
