@@ -17,7 +17,7 @@ Redis是一个基于**内存**的key-value结构数据库。Redis 是互联网�
 
 **key-value结构存储：**
 
-![](/images/redis.assets/image-20221130173459174.png)
+![](../../../public/images/redis.assets/image-20221130173459174.png)
 
 **主要特点：**
 
@@ -55,7 +55,7 @@ Redis安装包分为windows版和Linux版：
 
 资料中已提供好的安装包：
 
-![image-20210927092053283](/images/redis.assets/image-20210927092053283.png)  -->
+![image-20210927092053283](../../../public/images/redis.assets/image-20210927092053283.png)  -->
 
 
 

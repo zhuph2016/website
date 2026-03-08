@@ -288,19 +288,19 @@ public class DataSourceConfig {
 
 * 代码生成器支持两种模式，一种生成单表的代码，比如只生成`pms_brand`表代码可以先输入`pms`，后输入`pms_brand`；
 
-![](/images/MyBatisPlus.assets/CJttbvwFbo7sQuxp9XLcW8cEnQb.png)
+![](../../../public/images/MyBatisPlus.assets/CJttbvwFbo7sQuxp9XLcW8cEnQb.png)
 
 * 生成单表代码结构一览；
 
-![](/images/MyBatisPlus.assets/Q0bSbMTT7ovyc8xrBhLch27snkh.png)
+![](../../../public/images/MyBatisPlus.assets/Q0bSbMTT7ovyc8xrBhLch27snkh.png)
 
 * 另一种直接生成整个模块的代码，需要带通配符`*`，比如生成`ums`模块代码可以先输入`ums`，后输入`ums_*`；
 
-![](/images/MyBatisPlus.assets/RTYBbyJD3oY4gJxFeBacXuvBnhS.png)
+![](../../../public/images/MyBatisPlus.assets/RTYBbyJD3oY4gJxFeBacXuvBnhS.png)
 
 * 生成整个模块代码结构一览。
 
-![](/images/MyBatisPlus.assets/IodnbOxuDoDYOAxqwIccUD1rnce.png)
+![](../../../public/images/MyBatisPlus.assets/IodnbOxuDoDYOAxqwIccUD1rnce.png)
 
 ## [自定义生成模板](https://www.macrozheng.com/project/mybatis_plus_start.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%94%9F%E6%88%90%E6%A8%A1%E6%9D%BF)
 
@@ -308,7 +308,7 @@ public class DataSourceConfig {
 
 * 首先我们可以从 MyBatis-Plus Generator依赖包的源码中找到默认模板，拷贝到项目的`resources/templates`目录下；
 
-![](/images/MyBatisPlus.assets/J4YkbvR2Ioj4WJxLwmzcjqWTn8g.png)
+![](../../../public/images/MyBatisPlus.assets/J4YkbvR2Ioj4WJxLwmzcjqWTn8g.png)
 
 * 在`MyBatisPlusGenerator`类中对`TemplateConfig`进行配置，配置好各个模板的路径；
 
@@ -441,7 +441,7 @@ public interface PmsBrandMapper extends BaseMapper<PmsBrand> {
 
 * 我们来看下`BaseMapper`中的方法，是不是基本可以满足我们的日常所需了；
 
-![](/images/MyBatisPlus.assets/N763bzdqzomiCwxreidc09Rvn1d.png)
+![](../../../public/images/images/MyBatisPlus.assets/N763bzdqzomiCwxreidc09Rvn1d.png)
 
 * 我们之前生成的`PmsBrandService`接口由于继承了`IService`接口，也拥有了各种CRUD方法；
 
@@ -460,7 +460,7 @@ public interface PmsBrandService extends IService<PmsBrand> {
 
 * 可以看下比`BaseMapper`中的更加丰富；
 
-![](/images/MyBatisPlus.assets/LCiwbHP99o1tjEx8M1RcOoKOnpf.png)
+![](../../../public/images/images/MyBatisPlus.assets/LCiwbHP99o1tjEx8M1RcOoKOnpf.png)
 
 * 有了这些`IService`和`BaseMapper`中提供的这些方法，我们单表查询就几乎不用手写SQL实现了，使用MyBatis-Plus实现以前`PmsBrandController`的方法更轻松了！
 

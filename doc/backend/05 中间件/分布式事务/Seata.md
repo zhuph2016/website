@@ -4,7 +4,7 @@ https://seata.apache.org/zh-cn/docs/overview/what-is-seata
 
 Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。
 
-![](/images/Seata.assets/image-7.png)
+![](../../../public/images/Seata.assets/image-7.png)
 
 # 产生背景
 
@@ -75,7 +75,7 @@ seata:
 
 打开“application.yml”文件，同时打开“application.example.yml”文件作为参考
 
-![](/images/Seata.assets/image-8.png)
+![](../../../public/images/Seata.assets/image-8.png)
 
 在 `conf/application.yaml`加入以下配置, 其余配置参考 [configuration options](https://github.com/apache/incubator-seata/blob/2.x/server/src/main/resources/application.example.yml):
 
@@ -160,15 +160,15 @@ seata:
 
 * 新建namespace
 
-![](/images/Seata.assets/image-4.png)
+![](../../../public/images/Seata.assets/image-4.png)
 
 * 新建配置
 
-![](/images/Seata.assets/image-5.png)
+![](../../../public/images/Seata.assets/image-5.png)
 
 此处 dataId 为 seataServer.properties
 
-![](/images/Seata.assets/image-6.png)
+![](../../../public/images/Seata.assets/image-6.png)
 
 
 
@@ -435,7 +435,7 @@ CREATE TABLE `undo_log` (
 
 进入“seata/bin”目录，双击“seata-server.bat”，会弹出个黑窗口。
 
-![](/images/Seata.assets/image-3.png)
+![](../../../public/images/Seata.assets/image-3.png)
 
 然后创建一个目录：`/root/logs/seata/` 之后运行后会打印如下日志：
 
@@ -445,11 +445,11 @@ CREATE TABLE `undo_log` (
 
 输入用户名（默认seata）、密码（默认seata)，即可进入控制台。
 
-![](/images/Seata.assets/image.png)
+![](../../../public/images/Seata.assets/image.png)
 
 同时在nacos上能看到有一个seata的服务注册上去了：
 
-![](/images/Seata.assets/image-1.png)
+![](../../../public/images/Seata.assets/image-1.png)
 
 
 
@@ -457,7 +457,7 @@ CREATE TABLE `undo_log` (
 
 到机器上，seata/bin目录下，执行：`sh seata-server.sh -h 116.62.53.29` 命令。通过-h指定本地的ip。
 
-![](/images/Seata.assets/image-2.png)
+![](../../../public/images/Seata.assets/image-2.png)
 
 
 
