@@ -2,7 +2,7 @@
 
 Canal 是由阿里巴巴开源的分布式数据库同步系统，主要用于实现MySQL数据库的日志解析和实时增量数据订阅与消费，广泛应用于数据库变更消息的捕获、数据迁移、缓存更新等场景。
 
-![](../../../public/images/Canal.assets/image.png)
+![](../../../../public/images/Canal.assets/image.png)
 
 基于日志增量订阅和消费的业务包括
 
@@ -57,7 +57,7 @@ canal 解析 binary log 对象(原始为 byte 流)
 
 <https://github.com/alibaba/canal/releases>&#x20;
 
-![](../../../public/images/Canal.assets/image-1.png)
+![](../../../../public/images/Canal.assets/image-1.png)
 
 ### **Deployer**
 
@@ -110,7 +110,7 @@ java -Xms128m -Xmx512m -XX:PermSize=128m ...其他参数...
 
 java -Xms128m -Xmx512m -XX:**MetaspaceSize**=128m ...其他参数...
 
-![](../../../public/images/Canal.assets/image-2.png)
+![](../../../../public/images/Canal.assets/image-2.png)
 
 ### **Adapter**
 
