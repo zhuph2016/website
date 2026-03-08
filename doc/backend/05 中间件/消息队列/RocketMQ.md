@@ -53,7 +53,7 @@ ROCKETMQ_HOME
 D:\07ProgramFiles\rocketmq-all-5.1.4-bin-release\bin
 ```
 
-![](../../../public/images/RocketMQ.assets/image-3.png)
+![](../../../../public/images/RocketMQ.assets/image-3.png)
 
 * <span style="color: rgb(143,149,158); background-color: inherit">启动name server</span>
 
@@ -65,7 +65,7 @@ start mqnamesrv.cmd
 
 如下报错
 
-![](../../../public/images/RocketMQ.assets/image-4.png)
+![](../../../../public/images/RocketMQ.assets/image-4.png)
 
 RocketMQ 的启动脚本（`mqnamesrv`/`mqbroker`）中，**默认写死了 JVM 启动参数 `-XX:+UseConcMarkSweepGC`（CMS 垃圾回收器）**；
 
@@ -105,15 +105,15 @@ set NAMESRV_ADDR=localhost:9876
 tools.cmd org.apache.rocketmq.example.quickstart.Producer
 ```
 
-![](../../../public/images/RocketMQ.assets/image-2.png)
+![](../../../../public/images/RocketMQ.assets/image-2.png)
 
 <span style="color: rgb(143,149,158); background-color: inherit">当生产者启动之后，会发送1000个消息，然后自动推出，当退出结束时会返回true：</span>
 
-![](../../../public/images/RocketMQ.assets/image-1.png)
+![](../../../../public/images/RocketMQ.assets/image-1.png)
 
 <span style="color: rgb(143,149,158); background-color: inherit">与此同时，消费者的窗口会开始接收生产者发送的消息，如下：</span>
 
-![](../../../public/images/RocketMQ.assets/image.png)
+![](../../../../public/images/RocketMQ.assets/image.png)
 
 <span style="color: rgb(143,149,158); background-color: inherit">表示RocketMQ功能正常启动。</span>
 
