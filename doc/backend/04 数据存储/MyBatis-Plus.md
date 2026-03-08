@@ -2,7 +2,7 @@ https://baomidou.com/
 
 MyBatis-Plus（简称 MP）是一个 MyBatis 的增强工具，在 MyBatis 的基础上只做增强不做改变，为简化开发、提高效率而生。MyBatis-Plus 提供了代码生成器，可以一键生成controller、service、mapper、model、mapper.xml代码，同时提供了丰富的CRUD操作方法，助我们解放双手！
 
-## [MyBatis-Plus集成](https://www.macrozheng.com/project/mybatis_plus_start.html#mybatis-plus%E9%9B%86%E6%88%90)
+## MyBatis-Plus集成
 
 > <span style="color: rgb(143,149,158); background-color: inherit">首先我们需要在SpringBoot项目中集成MyBatis-Plus，之后我们再详细介绍它的使用方法！</span>
 
@@ -78,7 +78,6 @@ public class MyBatisConfig {
 ```java
 /**
  * MyBatisPlus代码生成器
- * Created by macro on 2020/8/20.
  */
 public class MyBatisPlusGenerator {
 
@@ -313,20 +312,112 @@ public class DataSourceConfig {
 
 * 在`MyBatisPlusGenerator`类中对`TemplateConfig`进行配置，配置好各个模板的路径；
 
-```plain&#x20;text
-/** * MyBatisPlus代码生成器 * Created by macro on 2020/8/20. */public class MyBatisPlusGenerator {        /**     * 初始化模板配置     */    private static TemplateConfig initTemplateConfig() {        TemplateConfig templateConfig = new TemplateConfig();        //可以对controller、service、entity模板进行配置        templateConfig.setEntity("templates/entity.java");        templateConfig.setMapper("templates/mapper.java");        templateConfig.setController("templates/controller.java");        templateConfig.setService("templates/service.java");        templateConfig.setServiceImpl("templates/serviceImpl.java");        //mapper.xml模板需单独配置        templateConfig.setXml(null);        return templateConfig;    }}
+```java
+/**
+ * MyBatisPlus代码生成器
+ */
+public class MyBatisPlusGenerator {
+    /**
+         * 初始化模板配置
+         */
+    private static TemplateConfig initTemplateConfig() {
+        TemplateConfig templateConfig = new TemplateConfig();
+        //可以对controller、service、entity模板进行配置        
+        templateConfig.setEntity("templates/entity.java");
+        templateConfig.setMapper("templates/mapper.java");
+        templateConfig.setController("templates/controller.java");
+        templateConfig.setService("templates/service.java");
+        templateConfig.setServiceImpl("templates/serviceImpl.java");
+        // mapper.xml模板需单独配置        
+        templateConfig.setXml(null);
+        return templateConfig;
+    }
+}
 ```
 
 * 对模板进行定制，在定制过程中我们可以发现很多内置变量，用于输出到模板中去，这里以`service.java.vm`模板为例子，比如`package`、`table`这些变量；
 
-```plain&#x20;text
-package ${package.Service};import ${package.Entity}.${entity};import ${superServiceClassPackage};/** * <p> * $!{table.comment} 服务类 * </p> * * @author ${author} * @since ${date} */#if(${kotlin})interface ${table.serviceName} : ${superServiceClass}<${entity}>#elsepublic interface ${table.serviceName} extends ${superServiceClass}<${entity}> {}#end
+```java
+package ${package.Service};
+
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+
+/**
+ * <p>
+ * $!{table.comment} 服务类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${kotlin})
+interface ${table.serviceName} : ${superServiceClass}<${entity}>
+#else
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+}
+#end
 ```
 
 * 搞懂这些变量从哪来的，对我们定制模板很有帮助，其实这些变量都来着于`AbstractTemplateEngine`的`getObjectMap`方法，具体变量作用可以参考源码。
 
-```plain&#x20;text
-/** * 模板引擎抽象类 * * @author hubin * @since 2018-01-10 */public abstract class AbstractTemplateEngine {        /**         * 渲染对象 MAP 信息         *         * @param tableInfo 表信息对象         * @return ignore         */        public Map<String, Object> getObjectMap(TableInfo tableInfo) {            Map<String, Object> objectMap = new HashMap<>(30);            ConfigBuilder config = getConfigBuilder();            if (config.getStrategyConfig().isControllerMappingHyphenStyle()) {                objectMap.put("controllerMappingHyphenStyle", config.getStrategyConfig().isControllerMappingHyphenStyle());                objectMap.put("controllerMappingHyphen", StringUtils.camelToHyphen(tableInfo.getEntityPath()));            }            objectMap.put("restControllerStyle", config.getStrategyConfig().isRestControllerStyle());            objectMap.put("config", config);            objectMap.put("package", config.getPackageInfo());            GlobalConfig globalConfig = config.getGlobalConfig();            objectMap.put("author", globalConfig.getAuthor());            objectMap.put("idType", globalConfig.getIdType() == null ? null : globalConfig.getIdType().toString());            objectMap.put("logicDeleteFieldName", config.getStrategyConfig().getLogicDeleteFieldName());            objectMap.put("versionFieldName", config.getStrategyConfig().getVersionFieldName());            objectMap.put("activeRecord", globalConfig.isActiveRecord());            objectMap.put("kotlin", globalConfig.isKotlin());            objectMap.put("swagger2", globalConfig.isSwagger2());            objectMap.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));            objectMap.put("table", tableInfo);            objectMap.put("enableCache", globalConfig.isEnableCache());            objectMap.put("baseResultMap", globalConfig.isBaseResultMap());            objectMap.put("baseColumnList", globalConfig.isBaseColumnList());            objectMap.put("entity", tableInfo.getEntityName());            objectMap.put("entitySerialVersionUID", config.getStrategyConfig().isEntitySerialVersionUID());            objectMap.put("entityColumnConstant", config.getStrategyConfig().isEntityColumnConstant());            objectMap.put("entityBuilderModel", config.getStrategyConfig().isEntityBuilderModel());            objectMap.put("chainModel", config.getStrategyConfig().isChainModel());            objectMap.put("entityLombokModel", config.getStrategyConfig().isEntityLombokModel());            objectMap.put("entityBooleanColumnRemoveIsPrefix", config.getStrategyConfig().isEntityBooleanColumnRemoveIsPrefix());            objectMap.put("superEntityClass", getSuperClassName(config.getSuperEntityClass()));            objectMap.put("superMapperClassPackage", config.getSuperMapperClass());            objectMap.put("superMapperClass", getSuperClassName(config.getSuperMapperClass()));            objectMap.put("superServiceClassPackage", config.getSuperServiceClass());            objectMap.put("superServiceClass", getSuperClassName(config.getSuperServiceClass()));            objectMap.put("superServiceImplClassPackage", config.getSuperServiceImplClass());            objectMap.put("superServiceImplClass", getSuperClassName(config.getSuperServiceImplClass()));            objectMap.put("superControllerClassPackage", verifyClassPacket(config.getSuperControllerClass()));            objectMap.put("superControllerClass", getSuperClassName(config.getSuperControllerClass()));            return Objects.isNull(config.getInjectionConfig()) ? objectMap : config.getInjectionConfig().prepareObjectMap(objectMap);        }}
+```java
+/**
+ * 模板引擎抽象类
+ *
+ * @author hubin
+ * @since 2018-01-10
+ */
+public abstract class AbstractTemplateEngine {
+        /**
+         * 渲染对象 MAP 信息
+         *
+         * @param tableInfo 表信息对象
+         * @return ignore
+         */
+        public Map<String, Object> getObjectMap(TableInfo tableInfo) {
+            Map<String, Object> objectMap = new HashMap<>(30);
+            ConfigBuilder config = getConfigBuilder();
+            if (config.getStrategyConfig().isControllerMappingHyphenStyle()) {
+                objectMap.put("controllerMappingHyphenStyle", config.getStrategyConfig().isControllerMappingHyphenStyle());
+                objectMap.put("controllerMappingHyphen", StringUtils.camelToHyphen(tableInfo.getEntityPath()));
+            }
+            objectMap.put("restControllerStyle", config.getStrategyConfig().isRestControllerStyle());
+            objectMap.put("config", config);
+            objectMap.put("package", config.getPackageInfo());
+            GlobalConfig globalConfig = config.getGlobalConfig();
+            objectMap.put("author", globalConfig.getAuthor());
+            objectMap.put("idType", globalConfig.getIdType() == null ? null : globalConfig.getIdType().toString());
+            objectMap.put("logicDeleteFieldName", config.getStrategyConfig().getLogicDeleteFieldName());
+            objectMap.put("versionFieldName", config.getStrategyConfig().getVersionFieldName());
+            objectMap.put("activeRecord", globalConfig.isActiveRecord());
+            objectMap.put("kotlin", globalConfig.isKotlin());
+            objectMap.put("swagger2", globalConfig.isSwagger2());
+            objectMap.put("date", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+            objectMap.put("table", tableInfo);
+            objectMap.put("enableCache", globalConfig.isEnableCache());
+            objectMap.put("baseResultMap", globalConfig.isBaseResultMap());
+            objectMap.put("baseColumnList", globalConfig.isBaseColumnList());
+            objectMap.put("entity", tableInfo.getEntityName());
+            objectMap.put("entitySerialVersionUID", config.getStrategyConfig().isEntitySerialVersionUID());
+            objectMap.put("entityColumnConstant", config.getStrategyConfig().isEntityColumnConstant());
+            objectMap.put("entityBuilderModel", config.getStrategyConfig().isEntityBuilderModel());
+            objectMap.put("chainModel", config.getStrategyConfig().isChainModel());
+            objectMap.put("entityLombokModel", config.getStrategyConfig().isEntityLombokModel());
+            objectMap.put("entityBooleanColumnRemoveIsPrefix", config.getStrategyConfig().isEntityBooleanColumnRemoveIsPrefix());
+            objectMap.put("superEntityClass", getSuperClassName(config.getSuperEntityClass()));
+            objectMap.put("superMapperClassPackage", config.getSuperMapperClass());
+            objectMap.put("superMapperClass", getSuperClassName(config.getSuperMapperClass()));
+            objectMap.put("superServiceClassPackage", config.getSuperServiceClass());
+            objectMap.put("superServiceClass", getSuperClassName(config.getSuperServiceClass()));
+            objectMap.put("superServiceImplClassPackage", config.getSuperServiceImplClass());
+            objectMap.put("superServiceImplClass", getSuperClassName(config.getSuperServiceImplClass()));
+            objectMap.put("superControllerClassPackage", verifyClassPacket(config.getSuperControllerClass()));
+            objectMap.put("superControllerClass", getSuperClassName(config.getSuperControllerClass()));
+            return Objects.isNull(config.getInjectionConfig()) ? objectMap : config.getInjectionConfig().prepareObjectMap(objectMap);
+        }
+}
 ```
 
 ## [CRUD操作](https://www.macrozheng.com/project/mybatis_plus_start.html#crud%E6%93%8D%E4%BD%9C)
@@ -335,8 +426,17 @@ package ${package.Service};import ${package.Entity}.${entity};import ${superServ
 
 * 我们之前生成的`PmsBrandMapper`接口由于继承了`BaseMapper`接口，直接拥有了各种CRUD方法；
 
-```plain&#x20;text
-/** * <p> * 品牌表 Mapper 接口 * </p> * * @author macro * @since 2020-08-20 */public interface PmsBrandMapper extends BaseMapper<PmsBrand> {}
+```java
+/**
+ * <p>
+ * 品牌表 Mapper 接口
+ * </p>
+ *
+ * @since 2020-08-20
+ */
+public interface PmsBrandMapper extends BaseMapper<PmsBrand> {
+
+}
 ```
 
 * 我们来看下`BaseMapper`中的方法，是不是基本可以满足我们的日常所需了；
@@ -345,8 +445,17 @@ package ${package.Service};import ${package.Entity}.${entity};import ${superServ
 
 * 我们之前生成的`PmsBrandService`接口由于继承了`IService`接口，也拥有了各种CRUD方法；
 
-```plain&#x20;text
-/** * <p> * 品牌表 服务类 * </p> * * @author macro * @since 2020-08-20 */public interface PmsBrandService extends IService<PmsBrand> {}
+```java
+/**
+ * <p>
+ * 品牌表 服务类
+ * </p>
+ *
+ * @since 2020-08-20
+ */
+public interface PmsBrandService extends IService<PmsBrand> {
+
+}
 ```
 
 * 可以看下比`BaseMapper`中的更加丰富；
@@ -355,14 +464,100 @@ package ${package.Service};import ${package.Entity}.${entity};import ${superServ
 
 * 有了这些`IService`和`BaseMapper`中提供的这些方法，我们单表查询就几乎不用手写SQL实现了，使用MyBatis-Plus实现以前`PmsBrandController`的方法更轻松了！
 
-```plain&#x20;text
-/** * <p> * 品牌表 前端控制器 * </p> * * @author macro * @since 2020-08-20 */@Api(tags = "PmsBrandController", description = "商品品牌管理")@RestController@RequestMapping("/brand")public class PmsBrandController {    private static final Logger LOGGER = LoggerFactory.getLogger(PmsBrandController.class);    @Autowired    private PmsBrandService brandService;    @ApiOperation("获取所有品牌列表")    @RequestMapping(value = "/listAll", method = RequestMethod.GET)    @ResponseBody    public CommonResult<List<PmsBrand>> getBrandList() {        return CommonResult.success(brandService.list());    }    @ApiOperation("添加品牌")    @RequestMapping(value = "/create", method = RequestMethod.POST)    @ResponseBody    public CommonResult createBrand(@RequestBody PmsBrand pmsBrand) {        CommonResult commonResult;        boolean result = brandService.save(pmsBrand);        if (result) {            commonResult = CommonResult.success(pmsBrand);            LOGGER.debug("createBrand success:{}", pmsBrand);        } else {            commonResult = CommonResult.failed("操作失败");            LOGGER.debug("createBrand failed:{}", pmsBrand);        }        return commonResult;    }    @ApiOperation("更新指定id品牌信息")    @RequestMapping(value = "/update", method = RequestMethod.POST)    @ResponseBody    public CommonResult updateBrand(@RequestBody PmsBrand pmsBrand) {        CommonResult commonResult;        boolean result = brandService.updateById(pmsBrand);        if (result) {            commonResult = CommonResult.success(pmsBrand);            LOGGER.debug("updateBrand success:{}", pmsBrand);        } else {            commonResult = CommonResult.failed("操作失败");            LOGGER.debug("updateBrand failed:{}", pmsBrand);        }        return commonResult;    }    @ApiOperation("删除指定id的品牌")    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)    @ResponseBody    public CommonResult deleteBrand(@PathVariable("id") Long id) {        boolean result = brandService.removeById(id);        if (result) {            LOGGER.debug("deleteBrand success :id={}", id);            return CommonResult.success(null);        } else {            LOGGER.debug("deleteBrand failed :id={}", id);            return CommonResult.failed("操作失败");        }    }    @ApiOperation("分页查询品牌列表")    @RequestMapping(value = "/list", method = RequestMethod.GET)    @ResponseBody    public CommonResult<CommonPage<PmsBrand>> listBrand(@RequestParam(value = "pageNum", defaultValue = "1")                                                        @ApiParam("页码") Integer pageNum,                                                        @RequestParam(value = "pageSize", defaultValue = "3")                                                        @ApiParam("每页数量") Integer pageSize) {        Page<PmsBrand> page = new Page<>(pageNum, pageSize);        Page<PmsBrand> pageResult = brandService.page(page);        return CommonResult.success(CommonPage.restPage(pageResult));    }    @ApiOperation("获取指定id的品牌详情")    @RequestMapping(value = "/{id}", method = RequestMethod.GET)    @ResponseBody    public CommonResult<PmsBrand> brand(@PathVariable("id") Long id) {        return CommonResult.success(brandService.getById(id));    }}
+```java
+/**
+ * <p>
+ * 品牌表 前端控制器
+ * </p>
+ *
+ */
+@Api(tags = "PmsBrandController", description = "商品品牌管理")
+@RestController
+@RequestMapping("/brand")
+public class PmsBrandController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PmsBrandController.class);
+
+    @Autowired
+    private PmsBrandService brandService;
+
+    @ApiOperation("获取所有品牌列表")
+    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<List<PmsBrand>> getBrandList() {
+        return CommonResult.success(brandService.list());
+    }
+
+    @ApiOperation("添加品牌")
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult createBrand(@RequestBody PmsBrand pmsBrand) {
+        CommonResult commonResult;
+        boolean result = brandService.save(pmsBrand);
+        if (result) {
+            commonResult = CommonResult.success(pmsBrand);
+            LOGGER.debug("createBrand success:{}", pmsBrand);
+        } else {
+            commonResult = CommonResult.failed("操作失败");
+            LOGGER.debug("createBrand failed:{}", pmsBrand);
+        }
+        return commonResult;
+    }
+
+    @ApiOperation("更新指定id品牌信息")
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult updateBrand(@RequestBody PmsBrand pmsBrand) {
+        CommonResult commonResult;
+        boolean result = brandService.updateById(pmsBrand);
+        if (result) {
+            commonResult = CommonResult.success(pmsBrand);
+            LOGGER.debug("updateBrand success:{}", pmsBrand);
+        } else {
+            commonResult = CommonResult.failed("操作失败");
+            LOGGER.debug("updateBrand failed:{}", pmsBrand);
+        }
+        return commonResult;
+    }
+
+    @ApiOperation("删除指定id的品牌")
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult deleteBrand(@PathVariable("id") Long id) {
+        boolean result = brandService.removeById(id);
+        if (result) {
+            LOGGER.debug("deleteBrand success :id={}", id);
+            return CommonResult.success(null);
+        } else {
+            LOGGER.debug("deleteBrand failed :id={}", id);
+            return CommonResult.failed("操作失败");
+        }
+    }
+
+    @ApiOperation("分页查询品牌列表")
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<CommonPage<PmsBrand>> listBrand(@RequestParam(value = "pageNum", defaultValue = "1")
+                                                        @ApiParam("页码") Integer pageNum,
+                                                        @RequestParam(value = "pageSize", defaultValue = "3")
+                                                        @ApiParam("每页数量") Integer pageSize) {
+        Page<PmsBrand> page = new Page<>(pageNum, pageSize);
+        Page<PmsBrand> pageResult = brandService.page(page);
+        return CommonResult.success(CommonPage.restPage(pageResult));
+    }
+
+    @ApiOperation("获取指定id的品牌详情")
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResult<PmsBrand> brand(@PathVariable("id") Long id) {
+        return CommonResult.success(brandService.getById(id));
+    }
+
+}
 ```
 
-## [项目源码地址](https://www.macrozheng.com/project/mybatis_plus_start.html#%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E5%9C%B0%E5%9D%80)
-
-https://github.com/macrozheng/mall-learning/tree/master/mall-tiny-plus
-
 ## 项目源码地址
+
+mybatis_plus_start
 
 [<span style="color: rgb(46,161,33); background-color: inherit">https://github.com/zhuph/zhuph-learning/springcloud-learning</span>](https://github.com/macrozheng/springcloud-learning)
