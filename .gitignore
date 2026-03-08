@@ -6,3 +6,7 @@ cache
 .cache
 .temp
 *.local
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/website.iml
+/.idea/.gitignore

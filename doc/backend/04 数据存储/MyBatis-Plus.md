@@ -441,7 +441,7 @@ public interface PmsBrandMapper extends BaseMapper<PmsBrand> {
 
 * 我们来看下`BaseMapper`中的方法，是不是基本可以满足我们的日常所需了；
 
-![](../../../public/images/images/MyBatisPlus.assets/N763bzdqzomiCwxreidc09Rvn1d.png)
+![](../../../public/images/MyBatisPlus.assets/N763bzdqzomiCwxreidc09Rvn1d.png)
 
 * 我们之前生成的`PmsBrandService`接口由于继承了`IService`接口，也拥有了各种CRUD方法；
 
@@ -460,7 +460,7 @@ public interface PmsBrandService extends IService<PmsBrand> {
 
 * 可以看下比`BaseMapper`中的更加丰富；
 
-![](../../../public/images/images/MyBatisPlus.assets/LCiwbHP99o1tjEx8M1RcOoKOnpf.png)
+![](../../../public/images/MyBatisPlus.assets/LCiwbHP99o1tjEx8M1RcOoKOnpf.png)
 
 * 有了这些`IService`和`BaseMapper`中提供的这些方法，我们单表查询就几乎不用手写SQL实现了，使用MyBatis-Plus实现以前`PmsBrandController`的方法更轻松了！
 
