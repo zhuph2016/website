@@ -126,7 +126,7 @@ public class MybatisTest extends BaseTest {
 }
 ```
 
-![1768523323407](../../../../zhuph-nfturbo/nfturbo-server/document/README.assets/1768523323407.png)
+![1772932266124](../../../public/images/Mybatis.assest/1772932266124.png)
 
 ## 5、参考文档
 
