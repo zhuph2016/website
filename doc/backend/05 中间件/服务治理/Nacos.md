@@ -38,7 +38,7 @@ startup.cmd -m standalone
 
 * 默认端口是8848，如果你电脑上的其它进程占用了8848端口，请先尝试关闭该进程。**如果无法关闭占用8848端口的进程**，也可以进入nacos的conf目录，修改配置文件中的端口：
 
-![](../../../public/images/Nacos.assets/image.png)
+![](../../../../public/images/Nacos.assets/image.png)
 
 ## linux
 
@@ -52,7 +52,7 @@ sh startup.sh -m standalone
 
 * 运行成功后，访问`http://localhost:8848/nacos`可以查看Nacos的主页，默认账号密码都是nacos。
 
-![](../../../public/images/Nacos.assets/AA56b1HuMoiSjExyNsEcZ0NPnKd.png)
+![](../../../../public/images/Nacos.assets/AA56b1HuMoiSjExyNsEcZ0NPnKd.png)
 
 ### 开启登录
 
@@ -118,7 +118,7 @@ management:
 
 * 运行两个nacos-user-service和一个nacos-ribbon-service，在Nacos页面上可以看到如下信息：
 
-![](../../../public/images/Nacos.assets/V5sAbKbQXoq96ax2vKjcUn08n9f.png)
+![](../../../../public/images/Nacos.assets/V5sAbKbQXoq96ax2vKjcUn08n9f.png)
 
 ## 负载均衡功能
 
@@ -213,7 +213,7 @@ config:  info: "config info for dev"
 
 * 填写配置示意图：
 
-![](../../../public/images/Nacos.assets/QUixbxmBMoxZjBxG97Zc98fFnfh.png)
+![](../../../../public/images/Nacos.assets/QUixbxmBMoxZjBxG97Zc98fFnfh.png)
 
 * 启动nacos-config-client，调用接口查看配置信息：http://localhost:9101/configInfo
 
