@@ -30,9 +30,9 @@ dubbo:
     name: dubbo
     port: -1
   registry:
-    address: nacos://114.xx.xx.45:8848
+    address: nacos://<Nacos服务器IP>:8848
     parameters:
-      namespace: dca38c77-bef4-40e0-97c3-7779f508b899
+      namespace: <namespace-id>
       group: dubbo
   application:
     name: ${spring.application.name}

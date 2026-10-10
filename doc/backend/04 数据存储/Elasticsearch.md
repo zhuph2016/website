@@ -41,7 +41,7 @@ Elasticsearch 是一个分布式搜索和分析引擎，基于 Apache Lucene 构
 ```
 spring:
   elasticsearch:
-    uris: http://116.xx.xx.29:9200
+    uris: http://<ES服务器IP>:9200
     username: elastic
     password: 123456
 ```

@@ -33,16 +33,16 @@ Copyright: 2015-2025 MinIO, Inc.
 License: GNU AGPLv3 - https://www.gnu.org/licenses/agpl-3.0.html
 Version: RELEASE.2025-04-22T22-12-26Z (go1.24.2 windows/amd64)
 
-API: http://192.168.0.103:9000  http://172.25.240.1:9000  http://192.168.244.1:9000  http://192.168.29.1:9000  http://127.0.0.1:9000
+API: http://<本机IP>:9000  http://127.0.0.1:9000
    RootUser: minioadmin
    RootPass: minioadmin
 
-WebUI: http://192.168.0.103:9001 http://172.25.240.1:9001 http://192.168.244.1:9001 http://192.168.29.1:9001 http://127.0.0.1:9001
+WebUI: http://<本机IP>:9001 http://127.0.0.1:9001
    RootUser: minioadmin
    RootPass: minioadmin
 
 CLI: https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart
-   $ mc alias set 'myminio' 'http://192.168.0.103:9000' 'minioadmin' 'minioadmin'
+   $ mc alias set 'myminio' 'http://<本机IP>:9000' 'minioadmin' 'minioadmin'
 
 Docs: https://docs.min.io
 WARN: Detected default credentials 'minioadmin:minioadmin', we recommend that you change these values with 'MINIO_ROOT_USER' and 'MINIO_ROOT_PASSWORD' environment variables

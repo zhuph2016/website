@@ -107,7 +107,7 @@ spring:
           timeout: 3000
           retryAttempts: 3
           retryInterval: 1500
-          password: 'NFTurbo666'
+          password: '<密码>'
           subscriptionsPerConnection: 5
           clientName: null
           address: "redis://r-xxxx.redis.rds.aliyuncs.com:6379"

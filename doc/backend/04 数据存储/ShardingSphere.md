@@ -85,9 +85,9 @@ spring:
       ds:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://rm-bp101vuh0edt82wo0go.mysql.rds.aliyuncs.com:3306/nfturbo
+        url: jdbc:mysql://rm-xxxx.mysql.rds.aliyuncs.com:3306/nfturbo
         username: nfturbo
-        password: 'NFTurbo666'
+        password: '<密码>'
         # Druid连接池配置
         datasource.druid:
           initial-size: 5 # 连接池初始化时创建的连接数。默认值为0。

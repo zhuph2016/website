@@ -148,7 +148,7 @@ seata:
 #  server:
 #    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
   security:
-    secretKey: SeataSecretKey0c382ef121d778043159209298fd40bf3850a017
+    secretKey: <Seata默认密钥，已脱敏>
     tokenValidityInMilliseconds: 1800000
     ignore:
       urls: /,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/api/v1/auth/login
@@ -455,7 +455,7 @@ CREATE TABLE `undo_log` (
 
 ## Linux
 
-到机器上，seata/bin目录下，执行：`sh seata-server.sh -h 116.62.53.29` 命令。通过-h指定本地的ip。
+到机器上，seata/bin目录下，执行：`sh seata-server.sh -h <服务器IP>` 命令。通过-h指定本地的ip。
 
 ![](../../../../public/images/Seata.assets/image-2.png)
 

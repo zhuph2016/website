@@ -22,7 +22,7 @@ Easy-ES 是一个简化 Elasticsearch 使用的框架，旨在帮助开发者更
 ```
 easy-es:
   enable: true
-  address : 116.xx.xx.29:9200
+  address : <ES服务器IP>:9200
   username: elastic
   password: 123456
 ```
