@@ -92,7 +92,7 @@ export default defineConfig({
 
     socialLinks: [
       { icon: "github", link: "https://github.com/zhuph2016/website" },
-      { icon: "gitee", link: "https://gitee.com/zhuph2016/website" },
+      { icon: "gitee", link: "https://gitee.com/zhuph/website" },
     ],
     // 底部配置
     footer: {
