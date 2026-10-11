@@ -42,5 +42,8 @@ features:
     details: 根据macro的开源项目mall搭建属于自己的学习框架
     link: /doc/mall/zhuph-mall
     icon: 🏬
+  - title: 更新中
+    details: 更多内容，敬请期待...
+    icon: ⏳
 ---
 
