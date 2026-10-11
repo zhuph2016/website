@@ -126,7 +126,7 @@ public class MybatisTest extends BaseTest {
 }
 ```
 
-![1772932266124](../../../public/images/Mybatis.assest/1772932266124.png)
+![1772932266124](../../../public/images/mybatis.assets/1772932266124.png)
 
 ## 5、参考文档
 

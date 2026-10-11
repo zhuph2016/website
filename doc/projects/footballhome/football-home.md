@@ -190,73 +190,73 @@ java -jar football-home-server/football-home-server-admin/target/football-home-s
 
 **首页**
 
-![img.png](../../public/images/football-home.assets/img.png)
+![img.png](../../../public/images/football-home.assets/img.png)
 
 **新闻**
 
-![img_1.png](../../public/images/football-home.assets/img_1.png)
+![img_1.png](../../../public/images/football-home.assets/img_1.png)
 
 **视频**
 
-![img_2.png](../../public/images/football-home.assets/img_2.png)
+![img_2.png](../../../public/images/football-home.assets/img_2.png)
 
 **图库**
 
-![img_3.png](../../public/images/football-home.assets/img_3.png)
+![img_3.png](../../../public/images/football-home.assets/img_3.png)
 
 **赛程**
 
-![img_4.png](../../public/images/football-home.assets/img_4.png)
+![img_4.png](../../../public/images/football-home.assets/img_4.png)
 
 **数据**
 
-![img_5.png](../../public/images/football-home.assets/img_5.png)
+![img_5.png](../../../public/images/football-home.assets/img_5.png)
 
 **商城**
 
-![img_6.png](../../public/images/football-home.assets/img_6.png)
+![img_6.png](../../../public/images/football-home.assets/img_6.png)
 
 **社区**
 
-![img_7.png](../../public/images/football-home.assets/img_7.png)
+![img_7.png](../../../public/images/football-home.assets/img_7.png)
 
 #### football-home-ui-admin 管理后台
 
 **首页**
 
-![img_8.png](../../public/images/football-home.assets/img_8.png)
+![img_8.png](../../../public/images/football-home.assets/img_8.png)
 
 **菜单**
 
-![img_9.png](../../public/images/football-home.assets/img_9.png)
+![img_9.png](../../../public/images/football-home.assets/img_9.png)
 
 **文件管理**
 
-![img_10.png](../../public/images/football-home.assets/img_10.png)
+![img_10.png](../../../public/images/football-home.assets/img_10.png)
 
 **系统监控**
 
-![img_11.png](../../public/images/football-home.assets/img_11.png)
+![img_11.png](../../../public/images/football-home.assets/img_11.png)
 
 **首页管理**
 
-![img_12.png](../../public/images/football-home.assets/img_12.png)
+![img_12.png](../../../public/images/football-home.assets/img_12.png)
 
 **商品管理**
 
-![img_13.png](../../public/images/football-home.assets/img_13.png)
+![img_13.png](../../../public/images/football-home.assets/img_13.png)
 
 **社区管理**
 
-![img_14.png](../../public/images/football-home.assets/img_14.png)
+![img_14.png](../../../public/images/football-home.assets/img_14.png)
 
 **会员管理**
 
-![img_15.png](../../public/images/football-home.assets/img_15.png)
+![img_15.png](../../../public/images/football-home.assets/img_15.png)
 
 **AI 会话**
 
-![img_16.png](../../public/images/football-home.assets/img_16.png)
+![img_16.png](../../../public/images/football-home.assets/img_16.png)
 
 ### 3. 移动端（Android）
 

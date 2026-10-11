@@ -41,37 +41,39 @@ export default defineConfig({
     },
     nav: [
       { text: "首页", link: "/index" },
+      {
+        text: "项目",
+        items: [
+          { text: "AI探索", link: "/doc/projects/ai/zhuph-ai" },
+          { text: "Agent智能体", link: "/doc/projects/agent/zhuph-agent" },
+          { text: "学习笔记", link: "/doc/projects/learn/zhuph-learn" },
+          { text: "外卖系统", link: "/doc/projects/takeout/zhuph-take-out" },
+          { text: "点评系统", link: "/doc/projects/dianping/zhuph-dianping" },
+          { text: "商城系统", link: "/doc/projects/mall/zhuph-mall" }
+        ],
+      },
       { text: "前端", link: "/doc/frontend" },
       { text: "后端", link: "/doc/backend" },
       { text: "面试", link: "/doc/interview" },
-      {
-        text: "教程",
-        items: [
-          { text: "若依ruoyi", link: "https://doc.ruoyi.vip/" },
-          {
-            text: "芋道yudao",
-            items: [
-              { text: "ruoyi-vue-pro", link: "https://doc.iocoder.cn/" },
-              { text: "yudao-cloud", link: "https://cloud.iocoder.cn/" },
-            ],
-          },
-          { text: "马士兵", link: "https://www.mashibing.com/sf/pc.html" },
-          { text: "mall", link: "https://www.macrozheng.com/" },
-        ],
-      },
+      { text: "AI", link: "/doc/ai/ai" },
       {
         text: "其他",
         items: [
-          { text: "Ai", link: "/doc/other/ai" },
           { text: "源码", link: "/doc/other/SourceCode" },
           { text: "博客", link: "/doc/other/blog" },
-          { text: "算法", link: "/doc/other/DataStructuresAlgorithms" },
+          { text: "数据结构", link: "/doc/other/DataStructures" },
+          { text: "算法", link: "/doc/other/Algorithms" },
+          { text: "开源项目", link: "/doc/other/OpenSource" },
         ],
       },
     ],
     sidebar: {
       "/doc/frontend": set_sidebar("/doc/frontend/"),
       "/doc/backend": set_sidebar("/doc/backend/"),
+      "/doc/projects": set_sidebar("/doc/projects/"),
+      "/doc/interview": set_sidebar("/doc/interview/"),
+      "/doc/ai": set_sidebar("/doc/ai/"),
+      "/doc/other": set_sidebar("/doc/other/"),
     },
     // sidebar: [
     //   {
