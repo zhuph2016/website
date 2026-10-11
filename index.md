@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: 足球之家
-#  text: Excelsior
+  text: Excelsior
   tagline: 打造贴合个人兴趣的生态产品
   image:
     src: /images/background.png
