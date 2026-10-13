@@ -1,1 +1,0 @@
-https://dlcdn.apache.org/zookeeper/
