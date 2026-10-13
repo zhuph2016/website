@@ -17,10 +17,10 @@
 
 | 方向 | 说明 | 入口 |
 | --- | --- | --- |
-| 后端 | Java 生态、Spring 全家桶、中间件、分布式、运维部署 | [后端文档](/doc/backend) |
-| 前端 | Web 基础、Node.js、VitePress 建站 | [前端文档](/doc/frontend) |
-| 面试 | 面试题整理与面经总结 | [面试文档](/doc/interview) |
-| 算法 | 数据结构与算法学习笔记 | [算法文档](/doc/other/DataStructuresAlgorithms) |
+| 后端 | Java 生态、Spring 全家桶、中间件、分布式、运维部署 | [后端文档](/doc/backend/) |
+| 前端 | Web 基础、Node.js、VitePress 建站 | [前端文档](/doc/frontend/) |
+| 面试 | 面试题整理与面经总结 | [面试文档](/doc/interview/) |
+| 算法 | 数据结构与算法学习笔记 | [数据结构](/doc/other/DataStructures) · [算法](/doc/other/Algorithms) |
 | 源码阅读 | 开源项目源码分析与学习 | [源码文档](/doc/other/SourceCode) |
 | 博客 | 个人博客与技术文章 | [博客文档](/doc/other/blog) |
 

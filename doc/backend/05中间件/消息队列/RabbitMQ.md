@@ -3,7 +3,7 @@
 - <https://blog.csdn.net/qq_41946216/article/details/127491635>
 - <https://github.com/rabbitmq/rabbitmq-server/releases>
 
-<http://localhost:15672/#/>
+`http://localhost:15672/#/`
 
 
 

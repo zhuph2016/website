@@ -4,11 +4,11 @@
 > 后端统一包名前缀：`com.zph.footballhome`，Maven groupId：`com.zph.footballhome`
 
 [![gitee](https://img.shields.io/badge/足球家系统-football--home-blue)](https://gitee.com/zhuph/football-home)
-[![version](https://img.shields.io/badge/version-1.0.0-blue)]()
-[![jdk](https://img.shields.io/badge/JDK-17-orange)]()
-[![spring-boot](https://img.shields.io/badge/Spring%20Boot-3.2.x-green)]()
-[![vue](https://img.shields.io/badge/Vue-3-42b883)]()
-[![android](https://img.shields.io/badge/Android-Kotlin%20%7C%20Compose-3ddc84)]()
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+![jdk](https://img.shields.io/badge/JDK-17-orange)
+![spring-boot](https://img.shields.io/badge/Spring%20Boot-3.2.x-green)
+![vue](https://img.shields.io/badge/Vue-3-42b883)
+![android](https://img.shields.io/badge/Android-Kotlin%20%7C%20Compose-3ddc84)
 
 ## 前言
 
@@ -272,10 +272,10 @@ cd football-home-ui-app
 
 | 入口                       | 地址                                                  |
 | -------------------------- | ----------------------------------------------------- |
-| 管理端前端                 | http://localhost:3083 （默认账号 `admin / admin123`） |
-| 用户端前端                 | http://localhost:3181                                 |
-| 管理端 API 文档（Knife4j） | http://localhost:8083/doc.html                        |
-| 网关                       | http://localhost:8082                                 |
+| 管理端前端                 | `http://localhost:3083` （默认账号 `admin / admin123`） |
+| 用户端前端                 | `http://localhost:3181`                                 |
+| 管理端 API 文档（Knife4j） | `http://localhost:8083/doc.html`                        |
+| 网关                       | `http://localhost:8082`                                 |
 
 ---
 
@@ -339,4 +339,4 @@ cd football-home-ui-app
 
 ## 八、许可证
 
-详见 [LICENSE](./LICENSE)。
+本项目为个人学习练习作品，暂未附加开源许可证。

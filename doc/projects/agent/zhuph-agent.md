@@ -62,7 +62,7 @@ cd agent-frontend
 npm run dev    # next dev --turbopack
 ```
 
-打开 http://localhost:3000。
+打开 `http://localhost:3000`。
 
 ## 约定
 

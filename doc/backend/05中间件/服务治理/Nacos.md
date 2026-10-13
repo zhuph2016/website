@@ -124,7 +124,7 @@ management:
 
 > <span style="color: rgb(143,149,158); background-color: inherit">由于我们运行了</span><span style="color: rgb(143,149,158); background-color: inherit">两个nacos-user-service，而nacos-</span><span style="color: rgb(143,149,158); background-color: inherit">ribbon-service默认会去调用它的接口，我们调用nacos-ribbon-service的接口来演示下负载均衡功能。</span>
 
-多次调用接口：http://localhost:8308/user/1 ，可以发现两个nacos-user-service的控制台交替打印如下信息。
+多次调用接口：`http://localhost:8308/user/1` ，可以发现两个nacos-user-service的控制台交替打印如下信息。
 
 ```plain&#x20;text
 2019-11-06 14:28:06.458  INFO 12092 --- [nio-8207-exec-2] c.macro.cloud.controller.UserController  : 根据id获取用户信息，用户名称为：macro
@@ -215,7 +215,7 @@ config:  info: "config info for dev"
 
 ![](../../../../public/images/nacos.assets/QUixbxmBMoxZjBxG97Zc98fFnfh.png)
 
-* 启动nacos-config-client，调用接口查看配置信息：http://localhost:9101/configInfo
+* 启动nacos-config-client，调用接口查看配置信息：`http://localhost:9101/configInfo`
 
 ```bash
 config info for dev

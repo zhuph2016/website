@@ -24,7 +24,7 @@ zhuph-take-out
 
 ### 后台管理系统（服务端）
 
-访问地址 http://localhost:8888/#/login
+访问地址 `http://localhost:8888/#/login`
 
 ![1772114443202](../../../public/images/takeout.assets/1772114443202.png)
 
@@ -85,13 +85,13 @@ zhuph-take-out
 
    jdk-11.0.2
 
-   API文档 http://localhost:8080/doc.html
+   API文档 `http://localhost:8080/doc.html`
 
 4. 启动前端工程
 
    node 16.20.2
 
-   http://localhost:8888/#/login
+   `http://localhost:8888/#/login`
 
 5. 启动微信小程序
 

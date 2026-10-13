@@ -12,8 +12,9 @@ https://redis.io/
 
 Redis是一个基于**内存**的key-value结构数据库。Redis 是互联网技术领域使用最为广泛的**存储中间件**。
 
-**官网：**https://redis.io
-**中文网：**https://www.redis.net.cn/
+**官网：** https://redis.io
+
+**中文网：** https://www.redis.net.cn/
 
 **key-value结构存储：**
 
@@ -56,8 +57,6 @@ Redis安装包分为windows版和Linux版：
 资料中已提供好的安装包：
 
 ![image-20210927092053283](../../../../public/images/redis.assets/image-20210927092053283.png)  -->
-
-
 
 #### 1.2.2 Redis安装
 
