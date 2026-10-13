@@ -51,9 +51,11 @@ function getList(params, path1, pathname) {
       });
     }
   }
-  // 对name做一下处理，把后缀删除
+  // 对name做一下处理：去掉 .md 后缀，并剥离开头的数字前缀（文件夹保留数字用于排序，显示时隐藏）
   res.map((item) => {
-    item.text = item.text.replace(/\.md$/, "");
+    item.text = item.text
+      .replace(/\.md$/, "")
+      .replace(/^\d{1,2}[-－.]?\s*/, "");
   });
   return res;
 }

@@ -17,8 +17,8 @@ export default defineConfig({
     outline: [1, 6],
     // 关闭侧边栏
     // sidebar: false,
-    // 设置右侧侧边栏在左侧显示
-    aside: "left",
+    // 文章目录（大纲）显示在页面右侧，参考 aileading.cn 文档站布局
+    aside: "right",
     // 设置搜索框的样式
     search: {
       provider: "local",
@@ -53,7 +53,17 @@ export default defineConfig({
         ],
       },
       { text: "前端", link: "/doc/frontend" },
-      { text: "后端", link: "/doc/backend" },
+      {
+        text: "后端",
+        items: [
+          { text: "开发环境", link: "/doc/backend/01开发环境/00-知识库总览" },
+          { text: "基础核心", link: "/doc/backend/02基础核心/Java基础/集合" },
+          { text: "开发框架", link: "/doc/backend/03开发框架/Logstash" },
+          { text: "数据存储", link: "/doc/backend/04数据存储/Caffeine" },
+          { text: "中间件", link: "/doc/backend/05中间件/任务调度/Quartz" },
+          { text: "运维与部署", link: "/doc/backend/07运维与部署/Docker" },
+        ],
+      },
       { text: "面试", link: "/doc/interview" },
       { text: "AI", link: "/doc/ai/ai" },
       {
@@ -69,6 +79,13 @@ export default defineConfig({
     ],
     sidebar: {
       "/doc/frontend": set_sidebar("/doc/frontend/"),
+      // 后端：按分组路径独立侧边栏，进入某分组时左侧只显示该分组内容
+      "/doc/backend/01开发环境/": set_sidebar("/doc/backend/01开发环境/"),
+      "/doc/backend/02基础核心/": set_sidebar("/doc/backend/02基础核心/"),
+      "/doc/backend/03开发框架/": set_sidebar("/doc/backend/03开发框架/"),
+      "/doc/backend/04数据存储/": set_sidebar("/doc/backend/04数据存储/"),
+      "/doc/backend/05中间件/": set_sidebar("/doc/backend/05中间件/"),
+      "/doc/backend/07运维与部署/": set_sidebar("/doc/backend/07运维与部署/"),
       "/doc/backend": set_sidebar("/doc/backend/"),
       "/doc/projects": set_sidebar("/doc/projects/"),
       "/doc/interview": set_sidebar("/doc/interview/"),
