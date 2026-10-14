@@ -24,24 +24,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
+          fetch-depth: 0 # lastUpdated 需要完整 git 历史
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4 # 安装pnpm并添加到环境变量
-        with:
-          version: 8.6.12 # 指定需要的 pnpm 版本
+        uses: pnpm/action-setup@v4 # 自动读取 package.json 的 packageManager 字段声明的版本
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20 # Node 18 已 EOL
           cache: pnpm # 设置缓存
       - name: Setup Pages
         uses: actions/configure-pages@v5  # 在工作流程自动配置GithubPages
       - name: Install dependencies
-        run: pnpm install # 安装依赖
+        run: pnpm install --frozen-lockfile # 严格按锁文件安装，保证构建可复现
       - name: Build with VitePress
         run: |
-          pnpm run build # 启动项目
-          touch .nojekyll  # 通知githubpages不要使用Jekyll处理这个站点，不知道为啥不生效，就手动搞了
+          pnpm run build
+          touch .vitepress/dist/.nojekyll  # 必须写进产物目录，根目录的这个文件不会被上传
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3  # 上传构建产物
         with:

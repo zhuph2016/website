@@ -5,16 +5,24 @@ import { set_sidebar } from "./utils/auto_sidebar.mjs";
 // 配置 https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: "/website/",
-  head: [["link", { rel: "icon", href: "/images/logo.jpg" }]],
+  // 注意：head 里的 href 不会自动拼接 base，必须手写含 /website 的完整路径
+  head: [["link", { rel: "icon", type: "image/jpeg", href: "/website/images/logo.jpg" }]],
   title: "行走江湖的个人网站",
-  description: "A VitePress Site",
-  // 在根级别配置，忽略所有死链接检查
-  ignoreDeadLinks: true,
+  description: "行走江湖的个人网站 — Java 后端 / 中间件 / AI 实践 / 项目笔记",
+  lang: "zh-CN",
+  // 保持死链检查开启，任何新增死链都会让构建失败。
+  // 唯一豁免：VitePress 会把脚注定义里的中文内容误判为相对链接（官方已知问题），
+  // 此处只放行这一条，其余死链一律构建失败。
+  // 注意：VitePress 传给匹配函数的 url 是「已 URL 编码 + 带 ./ 前缀」的完整形式。
+  ignoreDeadLinks: [
+    (url: string) =>
+      decodeURIComponent(url).includes("这是脚注内容示例，可以放参考资料链接"),
+  ],
   // https://vitepress.dev/reference/default-theme-config
   themeConfig: {
     logo: "/images/logo.jpg",
     outlineTitle: "文章目录",
-    outline: [1, 6],
+    outline: [2, 3],
     // 关闭侧边栏
     // sidebar: false,
     // 文章目录（大纲）显示在页面右侧，参考 aileading.cn 文档站布局
@@ -52,7 +60,7 @@ export default defineConfig({
           { text: "商城系统", link: "/doc/projects/mall/zhuph-mall" }
         ],
       },
-      { text: "前端", link: "/doc/frontend" },
+      { text: "前端", link: "/doc/frontend/" },
       {
         text: "后端",
         items: [
@@ -66,8 +74,8 @@ export default defineConfig({
           { text: "Python", link: "/doc/backend/08Python/Python" },
         ],
       },
-      { text: "面试", link: "/doc/interview" },
-      { text: "AI", link: "/doc/ai/ai" },
+      { text: "面试", link: "/doc/interview/" },
+      { text: "AI", link: "/doc/ai/index" },
       {
         text: "其他",
         items: [

@@ -1,166 +1,285 @@
-https://rocketmq.apache.org/zh/docs/
+# RocketMQ
 
-# 简介
+> 官方文档：<https://rocketmq.apache.org/zh/docs/>
+>
+> 源码：<https://github.com/apache/rocketmq>
 
-RocketMQ 是一款**纯 Java 开发、分布式、高吞吐、高可靠、低延迟**的消息中间件，前身是阿里的 MetaQ，2016 年开源，2017 年成为 Apache 顶级项目，**主打分布式场景**，完美适配微服务架构。
+RocketMQ 是一款**纯 Java 开发、分布式、高吞吐、高可靠、低延迟**的消息中间件。前身是阿里的 MetaQ，2016 年开源，2017 年成为 Apache 顶级项目，**主打分布式场景**，适配微服务架构。
 
-## 产生背景
+---
 
-在阿里孕育 RocketMQ 的雏形时期，我们将其用于异步通信、搜索、社交网络活动流、数据管道，贸易流程中。随着我们的贸易业务吞吐量的上升，源自我们的消息传递集群的压力也变得紧迫。
+## 一、为什么选择 RocketMQ
 
-根据我们的研究，随着队列和虚拟主题使用的增加，ActiveMQ IO模块达到了一个瓶颈。我们尽力通过节流、断路器或降级来解决这个问题，但效果并不理想。于是我们尝试了流行的消息传递解决方案Kafka。不幸的是，Kafka不能满足我们的要求，其尤其表现在低延迟和高可靠性方面，详见下文。在这种情况下，我们决定发明一个新的消息传递引擎来处理更广泛的消息用例，覆盖从传统的pub/sub场景到高容量的实时零误差的交易系统。
+### 产生背景
 
-Apache RocketMQ 自诞生以来，因其架构简单、业务功能丰富、具备极强可扩展性等特点被众多企业开发者以及云厂商广泛采用。历经十余年的大规模场景打磨，RocketMQ 已经成为业内共识的金融级可靠业务消息首选方案，被广泛应用于互联网、大数据、移动互联网、物联网等领域的业务场景。
+在阿里孕育 RocketMQ 雏形的时期，它被用于异步通信、搜索、社交网络活动流、数据管道、贸易流程。随着贸易业务吞吐上升，原有消息集群（ActiveMQ）的 IO 模块到达瓶颈——节流、断路器、降级都效果不佳；尝试 Kafka 后，其**低延迟和高可靠性**又无法满足交易类场景。于是决定自研新的消息引擎，覆盖从传统 pub/sub 到高容量实时零误差交易系统的全场景。
 
-## 对比主流MQ
+历经十余年打磨，RocketMQ 已成为业内共识的**金融级可靠业务消息**首选方案。
 
-市面上主流 MQ：`RocketMQ`、`Kafka`、`RabbitMQ`，三者各有侧重，**RocketMQ 是「综合能力天花板」**，也是国内企业首选：
+### 与主流 MQ 对比
 
-* ✅ **对比 Kafka**：Kafka 主打大数据日志传输、超高吞吐，但**事务消息、顺序消息、定时消息、死信队列**等企业级特性缺失；RocketMQ 吞吐接近 Kafka，同时补齐所有企业级特性，且运维更简单、单机稳定性更高。
+| 特性 | RocketMQ | ActiveMQ | Kafka |
+| --- | --- | --- | --- |
+| 事务消息 | **原生两阶段提交** | XA（重量级） | 不支持 |
+| 延迟消息 | **任意精度** | 有限级别 | 不支持 |
+| 死信队列 | **内置重试机制** | 内置 | 需手动实现 |
+| 消息轨迹 | **内置全链路追踪** | 插件实现 | 不支持 |
+| 消息过滤 | **SQL92 + Tag** | 有限支持 | 仅 Topic 级 |
+| 消息顺序 | **分区级严格 FIFO** | — | 仅分区级 |
+| 水平扩展 | **线性扩展** | 有限 | 受分区数约束 |
+| 运维工具 | **Dashboard + CLI** | 基础 Web 控制台 | 依赖第三方 |
+| 协议支持 | gRPC/MQTT/AMQP/HTTP | AMQP/STOMP/MQTT | 自定义 TCP |
 
-* ✅ **对比 RabbitMQ**：RabbitMQ 基于 Erlang 开发，功能丰富，但**高吞吐场景性能不足、分布式集群扩展麻烦、海量消息堆积时容易 OOM**；RocketMQ 纯 Java 开发，和业务系统技术栈一致，集群扩展无缝，百万级消息堆积无压力。
+选型结论：
 
-* ✅ **核心优势**：**功能全、性能强、易运维、生态完善**，阿里内部经过双 11 超万亿消息量验证，生产环境绝对可靠。
+- **对比 Kafka**：Kafka 主打大数据日志传输、吞吐极高，但企业级特性缺失；RocketMQ 吞吐接近 Kafka，同时补齐事务、延时、死信、顺序消息，运维也更简单
+- **对比 RabbitMQ**：RabbitMQ 基于 Erlang，高吞吐场景性能不足、集群扩展麻烦、海量堆积易 OOM；RocketMQ 纯 Java 与业务技术栈一致，百万级堆积无压力
 
-## 应用场景
+### 核心应用场景
 
-开发中 RocketMQ 的核心使用场景，几乎覆盖所有业务：
+1. **异步解耦**（最核心）：下单后「扣库存、减余额」从同步执行改为发 MQ 消息异步消费，彻底解耦、削峰填谷、提升接口响应速度
+2. **流量削峰**：秒杀场景请求暴增，MQ 承接全部请求，消费端按自身能力匀速消费，避免数据库被冲垮
+3. **日志归集**：分布式服务日志异步发送到日志服务统一存储分析
+4. **最终一致性**：分布式事务场景通过**事务消息**保证跨服务数据最终一致，替代复杂的 2PC
+5. **广播通知**：配置更新、缓存刷新等需要所有服务节点消费的场景
+6. **延时任务**：基于延时消息实现非精准定时任务，如订单 30 分钟未支付自动关闭
 
-1. **异步解耦**：最核心场景！比如下单后「扣库存、减余额」同步执行，改为下单成功后发送 MQ 消息，库存 / 余额服务异步消费，**彻底解耦系统、削峰填谷、提升接口响应速度**。
+---
 
-2. **流量削峰**：秒杀 / 抢购场景，请求量瞬间暴增，MQ 承接所有请求，消费端按自身能力匀速消费，避免数据库被冲垮。
+## 二、核心概念
 
-3. **日志归集**：分布式服务的日志，通过 MQ 异步发送到日志服务，统一存储分析。
+理解这几个概念是后面所有操作的基础：
 
-4. **最终一致性**：分布式事务场景，通过**事务消息**保证跨服务的数据最终一致（替代复杂的 2PC）。
+| 概念 | 说明 |
+| --- | --- |
+| **NameServer** | 轻量级路由节点，集群的**通讯录**，维护 Broker 地址，不存储消息、不参与消息传输 |
+| **Broker** | 消息存储与投递的真正载体，分 Master / Slave 角色 |
+| **Topic** | 消息的逻辑分类，类似数据库的表 |
+| **MessageQueue** | Topic 下的物理队列，**顺序消息的最小单位**，一个 Topic 默认 4 个队列 |
+| **Tag** | Topic 下的二级分类，消费端可用 `*` 或表达式过滤 |
+| **ProducerGroup** | 生产者组，同组内多个实例保证**事务消息**的分布式锁 |
+| **ConsumerGroup** | 消费者组，同组内消息**只被一个实例消费**（集群消费）；各实例都消费则是广播模式 |
 
-5. **广播通知**：一个消息需要被所有服务节点消费（比如配置更新、缓存刷新）。
+::: tip 生产者与消费者组的核心区别
+消费者组内是**负载均衡**关系——组内每个消息只被一个消费者处理；而生产者组内是**广播**关系——每个生产者实例发出的消息都要同步给所有 Broker。
+:::
 
-6. **定时任务**：基于**延时消息**实现非精准定时任务（比如订单 30 分钟未支付自动关闭）。
+### 消息存储结构
 
-
-
-# 安装部署
-
-## Windows
-
-* <span style="color: rgb(143,149,158); background-color: inherit">下载地址：</span><span style="color: rgb(143,149,158); background-color: inherit">https://rocketmq.apache.org/download</span>
-
-* 环境变量配置
-
-```shell
-ROCKETMQ_HOME 
-D:\07ProgramFiles\rocketmq-all-5.1.4-bin-release\bin
+```
+Topic（逻辑分类）
+  └─ MessageQueue（物理队列，4 个默认）
+       └─ CommitLog（单个存储文件，所有队列共用）
+            └─ ConsumeQueue（逻辑索引，记录消息在 CommitLog 中的位置）
 ```
 
-![](../../../../public/images/rocketmq.assets/image-3.png)
+RocketMQ 采用**顺序写 + 随机读**设计：消息统一追加写入 CommitLog，消费时先读 ConsumeQueue 拿到物理偏移，再去 CommitLog 定位消息体。这是它高吞吐的根本原因。
 
-* <span style="color: rgb(143,149,158); background-color: inherit">启动name server</span>
+---
 
-<span style="color: rgb(143,149,158); background-color: inherit">打开 命令提示符 界面，进入自己的RocketMQ安装目录下的bin目录，输入下面命令启动 nameserver：</span>
+## 三、安装部署
+
+### 环境要求
+
+- 64 位操作系统，推荐 Linux / Unix / macOS
+- **64 位 JDK 1.8+**
+- 下载：https://rocketmq.apache.org/download
+
+### Windows
+
+#### 1. 配置环境变量
+
+新增系统环境变量 `ROCKETMQ_HOME`：
+
+![配置 ROCKETMQ_HOME 环境变量](/images/rocketmq.assets/image-3.png)
+
+同时将 `%ROCKETMQ_HOME%\bin` 加入 `Path`。
+
+#### 2. 启动 NameServer
+
+打开命令提示符，进入 RocketMQ 安装目录的 `bin` 目录：
 
 ```shell
 start mqnamesrv.cmd
 ```
 
-如下报错
+::: warning 高版本 JDK 启动报错
+用 JDK 11/17/21 启动时会出现如下报错：
 
-![](../../../../public/images/rocketmq.assets/image-4.png)
+![启动报错 Unrecognized VM option](/images/rocketmq.assets/image-4.png)
 
-RocketMQ 的启动脚本（`mqnamesrv`/`mqbroker`）中，**默认写死了 JVM 启动参数 `-XX:+UseConcMarkSweepGC`（CMS 垃圾回收器）**；
+**原因**：RocketMQ 的启动脚本（`mqnamesrv` / `mqbroker`）中写死了 CMS 垃圾回收器相关的 JVM 参数：
 
-这个参数是 **JDK8 专属支持** 的，在 **JDK9、11、17、21 等高版本 JDK 中被彻底移除**；
+- `-XX:+UseConcMarkSweepGC`
+- `-XX:+UseCMSCompactAtFullCollection`
+- `-XX:+PrintGCDateStamps`
 
-找到 `bin` 目录下的 `runserver.cmd` 和 `runbroker.cmd` 两个文件，**用记事本 / Notepad++ 打开，分别修改**：
+这些参数在 **JDK 8 可用，JDK 9 起废弃，JDK 14 起被彻底移除**（CMS 收集器已从 HotSpot 中删除），所以高版本 JDK 无法识别。
 
-UseConcMarkSweepGC 修改为&#x20;
+**方案一：切换到 JDK 8**（最省事，适合本地开发）
 
-* <span style="color: rgb(143,149,158); background-color: inherit">启动broker</span>
+修改系统环境变量 `JAVA_HOME` 指向 JDK 8，或在 `runserver.cmd` / `runbroker.cmd` 中把 `%JAVA_HOME%` 直接替换为 JDK 8 的绝对路径：
 
-```shell
-start mqbroker.cmd -n 127.0.0.1:9876 autoCreateTopicEnable=true
+```bat
+set "JAVA=D:\07ProgramFiles\jdk1.8.0_xxx\bin\java.exe"
 ```
 
-## Linux
+::: tip 方案二：声明 JDK 主版本号（不改脚本）
+在环境变量中新增 `JAVA_MAJOR_VERSION`，值填你的 JDK 主版本号（如 `17`），启动脚本内部会据此判断并跳过 CMS 参数。
 
-# 功能测试
+**方案三：手动修改脚本参数**
+用记事本打开 `bin` 目录下的 `runserver.cmd` 和 `runbroker.cmd`，把上述 CMS 参数**全部删除**，或替换为高版本 JDK 支持的收集器，例如：
 
-## 启动消费者
+```bat
+set "JAVA_OPT=%JAVA_OPT% -XX:+UseG1GC"
+```
 
-<span style="color: rgb(143,149,158); background-color: inherit">打开cmd窗口，进入RocketMQ安装目录的bin目录，运行下面指令，启动消费者：</span>
+三个方案任选其一，推荐方案二；改动前建议先备份脚本。
+:::
 
-<span style="color: rgb(143,149,158); background-color: inherit">RocketMQ自带了发送和接收消息的脚本 tools.cmd，用来验证RocketMQ的功能是否正常。</span>
+#### 3. 启动 Broker
+
+```shell
+start mqbroker.cmd -n 127.0.0.1:9876 -c ../conf/broker.conf
+```
+
+::: tip 参数说明
+- `-n 127.0.0.1:9876`：指定 NameServer 地址
+- `-c ../conf/broker.conf`：指定 Broker 配置文件（可选）
+- `autoCreateTopicEnable=true`：允许自动创建 Topic，**仅建议本地调试使用**，生产环境应显式创建 Topic
+:::
+
+启动成功后不要关闭窗口。日志一般在用户目录下的 `logs/rocketmqlogs/` 中。
+
+### Linux
+
+```shell
+# 启动 NameServer
+nohup sh bin/mqnamesrv &
+
+# 启动 Broker（5.x 使用 Local 模式，Broker 与 Proxy 同进程）
+nohup sh bin/mqbroker -n localhost:9876 --enable-proxy &
+```
+
+验证是否启动成功：
+
+```shell
+tail -f ~/logs/rocketmqlogs/namesrv.log   # 出现 The Name Server boot success...
+tail -f ~/logs/rocketmqlogs/proxy.log     # 出现 The broker[broker-a,ip:port] boot success...
+```
+
+停止服务：
+
+```shell
+sh bin/mqshutdown broker
+sh bin/mqshutdown namesrv
+```
+
+### 常用端口
+
+| 端口 | 用途 |
+| --- | --- |
+| 9876 | NameServer 对外服务端口 |
+| 10909 | Broker VIP 通道（主从同步） |
+| 10911 | Broker 对外服务端口 |
+| 10912 | Broker HA 通道 |
+| 8080 / 8081 | Proxy（5.x gRPC 接入点） |
+
+---
+
+## 四、功能验证
+
+RocketMQ 自带收发消息的示例脚本 `tools.cmd`（Linux 为 `tools.sh`），用于验证功能是否正常。
+
+### 启动消费者
+
+打开一个 cmd 窗口，进入 `bin` 目录：
 
 ```shell
 set NAMESRV_ADDR=localhost:9876
 tools.cmd org.apache.rocketmq.example.quickstart.Consumer
 ```
 
-## <span style="color: rgb(143,149,158); background-color: inherit">启</span>动生产者
+### 启动生产者
 
-<span style="color: rgb(143,149,158); background-color: inherit">打开cmd窗口，进入RocketMQ安装目录的bin目录，运行下面指令，启动生产者：</span>
+再打开一个 cmd 窗口，进入 `bin` 目录：
+
+![启动生产者](/images/rocketmq.assets/image-2.png)
 
 ```shell
 set NAMESRV_ADDR=localhost:9876
 tools.cmd org.apache.rocketmq.example.quickstart.Producer
 ```
 
-![](../../../../public/images/rocketmq.assets/image-2.png)
+生产者会发送 1000 条消息，每条返回 `sendStatus=SEND_OK` 表示发送成功：
 
-<span style="color: rgb(143,149,158); background-color: inherit">当生产者启动之后，会发送1000个消息，然后自动推出，当退出结束时会返回true：</span>
+![生产者发送成功](/images/rocketmq.assets/image-1.png)
 
-![](../../../../public/images/rocketmq.assets/image-1.png)
+与此同时，消费者窗口开始接收消息：
 
-<span style="color: rgb(143,149,158); background-color: inherit">与此同时，消费者的窗口会开始接收生产者发送的消息，如下：</span>
+![消费者接收消息](/images/rocketmq.assets/image.png)
 
-![](../../../../public/images/rocketmq.assets/image.png)
+能正常收发消息，说明 RocketMQ 功能正常。
 
-<span style="color: rgb(143,149,158); background-color: inherit">表示RocketMQ功能正常启动。</span>
+---
 
-# <span style="color: rgb(143,149,158); background-color: inherit">插件部署</span>
+## 五、控制台部署
 
-## `rocketmq-console`
+### rocketmq-console 已废弃
 
-从 RocketMQ 4.9.0 版本开始，官方已经把 `rocketmq-console` 控制台模块从 `rocketmq-externals` 这个仓库中**彻底移除**了
+从 RocketMQ 4.9.0 起，官方已将 `rocketmq-console` 从 `rocketmq-externals` 仓库移除（https://github.com/apache/rocketmq-externals）。
 
-https://github.com/apache/rocketmq-externals
+独立控制台项目已**迁移并重命名为 `rocketmq-dashboard`**：https://github.com/apache/rocketmq-dashboard
 
-## `rocketmq-dashboard`
+::: warning 注意路径变化
+旧教程里的 `rocketmq-externals/rocketmq-console/src/main/resources` 在新项目下应为 `rocketmq-dashboard/src/main/resources`，打包产物也从 `rocketmq-console-ng-*.jar` 变成了 `rocketmq-dashboard-*.jar`。
+:::
 
-官方把独立的 `rocketmq-console` 项目，**迁移并重命名**为：`rocketmq-dashboard`
+### 部署步骤
 
-https://github.com/apache/rocketmq-dashboard
+**1. 解压并修改配置**
 
-<span style="color: rgb(143,149,158); background-color: inherit">解压完成之后，进入目录：rocketmq-externals/rocketmq-console/src/main/resources</span> <span style="color: rgb(143,149,158); background-color: inherit">找到 application.properties</span>
+进入 `rocketmq-dashboard/src/main/resources`，编辑 `application.properties`：
 
-修改配置
-
-```yaml
-server.port=8081
+```properties
+server.port=8080
 rocketmq.config.namesrvAddr=127.0.0.1:9876
 ```
 
-打包
+::: tip 端口说明
+`server.port` **默认是 8080**。如果与本机已有服务冲突（如 Tomcat、Nacos），改成一个空闲端口即可——注意访问地址要和这里配置的一致。
+:::
 
-mvn clean package '-Dmaven.test.skip=true'
+**2. 打包**
 
-java -jar rocketmq-console-ng-2.0.0.jar
+在 `rocketmq-dashboard` 根目录执行：
 
-## 控制台登录
+```shell
+mvn clean package -Dmaven.test.skip=true
+```
 
-<http://127.0.0.1:8082>
+**3. 启动**
 
-http://127.0.0.1:8083/
+```shell
+java -jar target/rocketmq-dashboard-1.0.0.jar
+```
 
-# 参考文档
+也可以不改配置文件，直接用启动参数指定：
 
-https://cloud.tencent.com/developer/article/2484888
+```shell
+java -jar target/rocketmq-dashboard-1.0.0.jar --server.port=8080 --rocketmq.config.namesrvAddr=127.0.0.1:9876
+```
 
-## Windows环境下RocketMQ的安装及配置（图文详解）
+### 访问控制台
 
-https://blog.csdn.net/weixin_43978412/article/details/113880980
+浏览器打开启动日志中打印的地址（默认 `http://127.0.0.1:8080`），控制台可查看 Topic、消费者组、消息轨迹、集群状态等。
 
+---
 
+## 六、参考资料
 
-## 项目源码地址
-
+- [RocketMQ 官方文档](https://rocketmq.apache.org/zh/docs/)
+- [RocketMQ 快速开始（官方）](https://rocketmq.apache.org/zh/docs/quickStart/01quickstart/)
+- [rocketmq-dashboard 仓库](https://github.com/apache/rocketmq-dashboard)
+- [Windows 环境下 RocketMQ 的安装及配置（图文详解）](https://blog.csdn.net/weixin_43978412/article/details/113880980)
+- [Unrecognized VM option 'UseConcMarkSweepGC' 问题解决](https://juejin.cn/post/7207042977385709605)
