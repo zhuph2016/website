@@ -1,8 +1,8 @@
 # RocketMQ
 
-> 官方文档：<https://rocketmq.apache.org/zh/docs/>
->
-> 源码：<https://github.com/apache/rocketmq>
+> 官方文档：[rocketmq.apache.org](https://rocketmq.apache.org/zh/docs/)  
+> 源码：   [github.com/apache/rocketmq](https://github.com/apache/rocketmq)  
+> 学习代码：[gitee.com/zhuph/zhuph-learn](https://gitee.com/zhuph/zhuph-learn)（`zhuph-rocketmq`）
 
 RocketMQ 是一款**纯 Java 开发、分布式、高吞吐、高可靠、低延迟**的消息中间件。前身是阿里的 MetaQ，2016 年开源，2017 年成为 Apache 顶级项目，**主打分布式场景**，适配微服务架构。
 
