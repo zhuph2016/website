@@ -4,11 +4,11 @@ https://springdoc.cn/spring-cloud-gateway/
 
 在如今的SpringCloud生态中，SpringCloud Gateway是一个至关重要的组件。Spring Cloud Gateway 是一个在 Spring 生态系统中建立的 API 网关，**它为微服务架构中的服务提供了一个简单有效的方式来路由请求、转发和过滤等功能。**
 
-![1772937469647](../../../../public/images/gateway.assets/1772937469647.png)
+![1772937469647](/images/gateway.assets/1772937469647.png)
 
 网关的作用就是提供统一接入，意味着所有的流量都需要先经过网关，然后再由网关转发出去。
 
-﻿![1772937518662](../../../../public/images/gateway.assets/1772937518662.png)
+﻿![1772937518662](/images/gateway.assets/1772937518662.png)
 
 
 
