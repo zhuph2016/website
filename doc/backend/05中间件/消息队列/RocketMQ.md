@@ -91,7 +91,7 @@ RocketMQ 采用**顺序写 + 随机读**设计：消息统一追加写入 Commit
 
 新增系统环境变量 `ROCKETMQ_HOME`：
 
-![配置 ROCKETMQ_HOME 环境变量](/images/rocketmq.assets/image-3.png)
+![配置 ROCKETMQ_HOME 环境变量](./rocketmq.assets/image-3.png)
 
 同时将 `%ROCKETMQ_HOME%\bin` 加入 `Path`。
 
@@ -106,7 +106,7 @@ start mqnamesrv.cmd
 ::: warning 高版本 JDK 启动报错
 用 JDK 11/17/21 启动时会出现如下报错：
 
-![启动报错 Unrecognized VM option](/images/rocketmq.assets/image-4.png)
+![启动报错 Unrecognized VM option](./rocketmq.assets/image-4.png)
 
 **原因**：RocketMQ 的启动脚本（`mqnamesrv` / `mqbroker`）中写死了 CMS 垃圾回收器相关的 JVM 参数：
 
@@ -204,7 +204,7 @@ tools.cmd org.apache.rocketmq.example.quickstart.Consumer
 
 再打开一个 cmd 窗口，进入 `bin` 目录：
 
-![启动生产者](/images/rocketmq.assets/image-2.png)
+![启动生产者](./rocketmq.assets/image-2.png)
 
 ```shell
 set NAMESRV_ADDR=localhost:9876
@@ -213,11 +213,11 @@ tools.cmd org.apache.rocketmq.example.quickstart.Producer
 
 生产者会发送 1000 条消息，每条返回 `sendStatus=SEND_OK` 表示发送成功：
 
-![生产者发送成功](/images/rocketmq.assets/image-1.png)
+![生产者发送成功](./rocketmq.assets/image-1.png)
 
 与此同时，消费者窗口开始接收消息：
 
-![消费者接收消息](/images/rocketmq.assets/image.png)
+![消费者接收消息](./rocketmq.assets/image.png)
 
 能正常收发消息，说明 RocketMQ 功能正常。
 

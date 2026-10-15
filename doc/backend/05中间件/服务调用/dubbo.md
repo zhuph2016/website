@@ -48,7 +48,7 @@ dubbo.registry.parameters：表示注册中心需要的一些特殊配置，这�
 
 namespace需要自己去 nacos 上创建一下，然后把他对应的值放到这个 yml 文件中
 
-![1772936727378](/images/dubbo.assets/1772936727378.png)
+![1772936727378](./dubbo.assets/1772936727378.png)
 
 dubbo.application：指定应用名
 

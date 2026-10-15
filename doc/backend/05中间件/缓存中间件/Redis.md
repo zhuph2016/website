@@ -10,7 +10,7 @@ Redis是一个基于**内存**的key-value结构数据库。Redis 是互联网�
 
 **key-value结构存储：**
 
-![](/images/redis.assets/image-20221130173459174.png)
+![](./redis.assets/image-20221130173459174.png)
 
 **主要特点：**
 
@@ -39,7 +39,7 @@ NoSql（Not Only SQL），不仅仅是SQL，泛指**非关系型数据库**。No
 
 **redis-cli.exe**
 
-<img src="/images/redis.assets/image-20221130182207020.png" alt="image-20221130182207020" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130182207020.png" alt="image-20221130182207020" style="zoom:50%;" /> 
 
 通过redis-cli.exe命令默认连接的是本地的redis服务，并且使用默认6379端口。也可以通过指定如下参数连接：
 
@@ -64,7 +64,7 @@ requirepass 123456
 redis-cli.exe -h localhost -p 6379 -a 123456
 ```
 
-<img src="/images/redis.assets/image-20221130183253539.png" alt="image-20221130183253539" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130183253539.png" alt="image-20221130183253539" style="zoom:50%;" /> 
 
 此时，-h 和 -p 参数可省略不写。
 
@@ -72,15 +72,15 @@ redis-cli.exe -h localhost -p 6379 -a 123456
 
 默认提供的客户端连接工具界面不太友好，同时操作也较为麻烦，接下来，引入一个Redis客户端图形工具。
 
-<img src="/images/redis.assets/image-20221130183746355.png" alt="image-20221130183746355" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130183746355.png" alt="image-20221130183746355" style="zoom:50%;" /> 
 
 **新建连接**
 
-<img src="/images/redis.assets/image-20221130192210418.png" alt="image-20221130192210418" style="zoom: 33%;" />  
+<img src="./redis.assets/image-20221130192210418.png" alt="image-20221130192210418" style="zoom: 33%;" />  
 
 **连接成功** 
 
-<img src="/images/redis.assets/image-20221130192310916.png" alt="image-20221130192310916" style="zoom: 33%;" />  
+<img src="./redis.assets/image-20221130192310916.png" alt="image-20221130192310916" style="zoom: 33%;" />  
 
 ## 2. Redis部署
 
@@ -108,7 +108,7 @@ Redis安装包分为windows版和Linux版：
 
 Redis的Windows版属于绿色软件，直接解压即可使用，解压后目录结构如下：
 
-<img src="/images/redis.assets/image-20221130180657152.png" alt="image-20221130180657152" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130180657152.png" alt="image-20221130180657152" style="zoom:50%;" /> 
 
 **windows后台启动redis操作步骤**
 
@@ -129,7 +129,7 @@ redis-server --service-stop
 
 **redis-server.exe redis.windows.conf**
 
-<img src="/images/redis.assets/image-20221130181950351.png" alt="image-20221130181950351" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130181950351.png" alt="image-20221130181950351" style="zoom:50%;" /> 
 
 Redis服务默认端口号为 **6379** ，通过快捷键**Ctrl + C** 即可停止Redis服务
 
@@ -586,7 +586,7 @@ Redis存储的是key-value结构的数据，其中key是字符串类型，value�
 
 ### 3.2 各种数据类型特点
 
-<img src="/images/redis.assets/image-20221130190150749.png" alt="image-20221130190150749" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130190150749.png" alt="image-20221130190150749" style="zoom:50%;" /> 
 
 **解释说明：**
 
@@ -597,8 +597,9 @@ Redis存储的是key-value结构的数据，其中key是字符串类型，value�
 - 有序集合(sorted set/zset)：集合中每个元素关联一个分数(score)，根据分数升序排序，没有重复元素
 
 
-
 ## 4. Redis常用命令
+
+https://redis.io/docs/latest/commands/
 
 ### 4.1 字符串操作命令
 
@@ -622,7 +623,7 @@ Redis hash 是一个string类型的 field 和 value 的映射表，hash特别适
 - **HKEYS** key                              获取哈希表中所有字段
 - **HVALS** key                              获取哈希表中所有值
 
-<img src="/images/redis.assets/image-20221130193121969.png" alt="image-20221130193121969" style="zoom: 67%;" /> 
+<img src="./redis.assets/image-20221130193121969.png" alt="image-20221130193121969" style="zoom: 67%;" /> 
 
 ### 4.3 列表操作命令
 
@@ -634,7 +635,7 @@ Redis 列表是简单的字符串列表，按照插入顺序排序，常用命�
 - **LLEN** key                                        获取列表长度
 - **BRPOP** key1 [key2 ] timeout       移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超    时或发现可弹出元素为止
 
-<img src="/images/redis.assets/image-20221130193332666.png" alt="image-20221130193332666" style="zoom: 67%;" /> 
+<img src="./redis.assets/image-20221130193332666.png" alt="image-20221130193332666" style="zoom: 67%;" /> 
 
 
 
@@ -649,7 +650,7 @@ Redis set 是string类型的无序集合。集合成员是唯一的，这就意�
 - **SUNION** key1 [key2]                                 返回所有给定集合的并集
 - **SREM** key member1 [member2]            移除集合中一个或多个成员
 
-<img src="/images/redis.assets/image-20221130193532735.png" alt="image-20221130193532735" style="zoom: 67%;" /> 
+<img src="./redis.assets/image-20221130193532735.png" alt="image-20221130193532735" style="zoom: 67%;" /> 
 
 
 
@@ -664,7 +665,7 @@ Redis有序集合是string类型元素的集合，且不允许有重复成员。
 - **ZINCRBY** key increment member                              有序集合中对指定成员的分数加上增量 increment
 - **ZREM** key member [member ...]                                移除有序集合中的一个或多个成员
 
-<img src="/images/redis.assets/image-20221130193951036.png" alt="image-20221130193951036" style="zoom: 67%;" /> 
+<img src="./redis.assets/image-20221130193951036.png" alt="image-20221130193951036" style="zoom: 67%;" /> 
 
 
 ```shell
@@ -841,7 +842,7 @@ Spring Data Redis 是 Spring 的一部分，提供了在 Spring 应用中通过�
 
 网址：https://spring.io/projects/spring-data-redis
 
-<img src="/images/redis.assets/image-20210927143741458.png" alt="image-20210927143741458" style="zoom: 33%;" /> 
+<img src="./redis.assets/image-20210927143741458.png" alt="image-20210927143741458" style="zoom: 33%;" /> 
 
 Spring Boot提供了对应的Starter，maven坐标：
 
@@ -982,7 +983,7 @@ public class SpringDataRedisTest {
 
 测试：
 
-<img src="/images/redis.assets/image-20221130205351403.png" alt="image-20221130205351403" style="zoom:50%;" /> 
+<img src="./redis.assets/image-20221130205351403.png" alt="image-20221130205351403" style="zoom:50%;" /> 
 
 说明RedisTemplate对象注入成功，并且通过该RedisTemplate对象获取操作5种数据类型相关对象。
 
@@ -1231,7 +1232,7 @@ public class RedisTest {
 </dependency>
 ```
 
-![1772936077937](/images/redis.assets/1772936077937.png)
+![1772936077937](./redis.assets/1772936077937.png)
 
 ## 7. Redisson
 
