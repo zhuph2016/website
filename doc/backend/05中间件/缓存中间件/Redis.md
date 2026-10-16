@@ -961,7 +961,7 @@ zhangsan
 
 Bitmap（位图）并不是一种新的数据类型，而是基于 **String** 类型实现的一组"位"操作：字符串的每个字节会被拆成 8 个 bit（二进制位），可以用一个 bit 表示一种状态（0 或 1），因此在"状态标记"类场景下比 String/Set 等类型节省大量内存。offset 从 0 开始，一个 key 最多可以存 2^32-1 个 bit（约 512MB）。
 
-![1792160921957](Redis.assets/1792160921957.png)
+![1792160921957](redis.assets/1792160921957.png)
 
 ```
 key  →  [ 0 | 1 | 0 | 0 | 0 | ... ]
@@ -1001,7 +1001,7 @@ offset:  0   1   2   3   4
 
 **每日签到场景（对应课程案例）：**
 
-![1792160889506](Redis.assets/1792160889506.png)
+![1792160889506](redis.assets/1792160889506.png)
 
 ```shell
 > setbit dailycheck:1 100 1   # 1号用户第100天完成了签到
@@ -1071,7 +1071,7 @@ OK
 
 Geo 类型用于存储地理位置信息（经度、纬度），底层实现是 ZSet（分数为 geohash 编码），常用来实现"附近的人 / 商家 / 景点"等 LBS 场景。
 
-![1792160864260](Redis.assets/1792160864260.png)
+![1792160864260](redis.assets/1792160864260.png)
 
 - **GEOADD** key [NX|XX] [CH] longitude latitude member [longitude latitude member ...]   添加一个或多个地点（参数顺序：经度 纬度 成员名）
 - **GEOPOS** key member [member ...]          返回一个或多个地点的经纬度
@@ -1097,7 +1097,7 @@ Geo 类型用于存储地理位置信息（经度、纬度），底层实现是 
 
 Stream 是 Redis 5.0 引入的**消息队列**类型，被称为"Redis 版的 MQ"——兼具**阻塞队列 + pub/sub** 的能力，支持消息持久化、消费者组、ACK 确认。企业应用相对较少（生产环境一般直接用 Kafka、RabbitMQ 等专业 MQ）。
 
-![1792160372912](Redis.assets/1792160372912.png)
+![1792160372912](redis.assets/1792160372912.png)
 
 - **XADD** key [NOMKSTREAM] [MAXLEN|MINID [=|~] threshold [LIMIT count]] *|id field value [field value ...]    往队列末尾发布一条消息（`*` 表示让系统自动生成 ID）
 - **XDEL** key id [id ...]                            删除队列中的一条或多条消息
