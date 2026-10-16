@@ -1,26 +1,26 @@
+# Redis 学习笔记
+
 ## 1. Redis入门
 
-### 1.1 Redis简介
+### 1.1 简介
 
-Redis是一个基于**内存**的key-value结构数据库。Redis 是互联网技术领域使用最为广泛的**存储中间件**。
+Redis（Remote Dictionary Server）是一个基于**内存**的 key-value 结构数据库，使用 C 语言开发、开源、高性能，官方数据可达 100000+ QPS（每秒查询次数），是互联网技术领域应用最广泛的**存储中间件**。它存储的 value 类型比较丰富，也被称为结构化的 NoSql 数据库。
 
 **官网：** https://redis.io
 
 **中文网：** https://www.redis.net.cn/
 
-**key-value结构存储：**
+**key-value 结构存储：**
 
-![](./redis.assets/image-20221130173459174.png)
+<img src="./redis.assets/image-20221130173459174.png" alt="key-value结构存储" style="zoom:50%;" />
 
 **主要特点：**
 
-- 基于内存存储，读写性能高  
+- 基于内存存储，读写性能高
 - 适合存储热点数据（热点商品、资讯、新闻）
 - 企业应用广泛
 
-Redis是用C语言开发的一个开源的高性能键值对(key-value)数据库，官方提供的数据是可以达到100000+的QPS（每秒内查询次数）。它存储的value类型比较丰富，也被称为结构化的NoSql数据库。
-
-NoSql（Not Only SQL），不仅仅是SQL，泛指**非关系型数据库**。NoSql数据库并不是要取代关系型数据库，而是关系型数据库的补充。
+NoSql（Not Only SQL），不仅仅是 SQL，泛指**非关系型数据库**。NoSql 数据库并不是要取代关系型数据库，而是关系型数据库的补充。
 
 **关系型数据库(RDBMS)：**
 
@@ -35,7 +35,7 @@ NoSql（Not Only SQL），不仅仅是SQL，泛指**非关系型数据库**。No
 - Mongo db
 - MemCached
 
-### 1.2 客户端连接命令
+### 1.2 客户端连接
 
 **redis-cli.exe**
 
@@ -68,7 +68,7 @@ redis-cli.exe -h localhost -p 6379 -a 123456
 
 此时，-h 和 -p 参数可省略不写。
 
-### 1.3 客户端图形工具
+### 1.3 图形工具
 
 默认提供的客户端连接工具界面不太友好，同时操作也较为麻烦，接下来，引入一个Redis客户端图形工具。
 
@@ -93,16 +93,16 @@ redis-cli.exe -h localhost -p 6379 -a 123456
 | 哨兵部署 | 1 主 + N 从 + 哨兵集群 | ✅ | ❌ | 自动故障转移 | 生产高可用 |
 | 集群部署 | N 主 + N 从 | ✅ | ✅ 16384 个哈希槽 | 分片 + 高可用 | 大数据量、高并发 |
 
-### 2.1 windows部署
+### 2.1 Windows
 
-#### 2.1.1 Redis下载
+#### 2.1.1 Redis 下载
 
 Redis安装包分为windows版和Linux版：
 
 - Windows版下载地址：https://github.com/microsoftarchive/redis/releases
 - Linux版下载地址： https://download.redis.io/releases/
 
-#### 2.1.2 Redis安装
+#### 2.1.2 Redis 安装
 
 **1）在Windows中安装Redis**
 
@@ -125,7 +125,7 @@ redis-server --service-start
 4. 停止服务【可以打开任务管理器的服务，找到redis手动关闭】
 redis-server --service-stop
 
-#### 2.1.3 Redis服务启动与停止
+#### 2.1.3 Redis 服务启动与停止
 
 **redis-server.exe redis.windows.conf**
 
@@ -135,7 +135,7 @@ Redis服务默认端口号为 **6379** ，通过快捷键**Ctrl + C** 即可停�
 
 当Redis服务启动成功后，可通过客户端进行连接。
 
-### 2.2 单机部署
+### 2.2 单机
 
 #### 2.2.1 检查安装 gcc 环境
 
@@ -192,9 +192,7 @@ ll /usr/local/bin
 redis-server
 ```
 
-::: warning 直接启动无法后台运行
-上面的启动方式无法在后台运行，退出之后直接关闭了 Redis 服务，所以还需要针对 Redis 做一些设置。
-:::
+> **注意：直接启动无法后台运行。** 上面的启动方式无法在后台运行，退出之后直接关闭了 Redis 服务，所以还需要针对 Redis 做一些设置。
 
 #### 2.2.4 配置 Redis
 
@@ -231,7 +229,7 @@ quit
 redis-cli shutdown
 ```
 
-### 2.3 主从部署（Master-Slave Replication）
+### 2.3 主从Master-Slave
 
 主从复制，是指将一台 Redis 服务器的数据，复制到其他的 Redis 服务器。前者称为**主节点（Master）**，后者称为**从节点（Slave）**；数据的复制是**单向**的，只能由主节点到从节点。默认情况下，每台 Redis 服务器都是主节点；一个主节点可以有多个从节点（或没有从节点），但一个从节点只能有一个主节点。
 
@@ -284,7 +282,7 @@ slave1:ip=192.168.75.132,port=6379,state=online,offset=270,lag=1
 - **复制延时、信号衰减**：所有的写操作都是先在 master 上操作，然后同步更新到 slave 上，从 master 同步到 slave 机器上有一定的延迟；系统繁忙时延迟问题更严重，slave 机器数量增加也会加剧该问题。
 - **master 挂了怎么办**：默认情况下，不会在 slave 节点中自动重选一个 master，每次都要人工干预。
 
-### 2.4 哨兵部署（Sentinel）
+### 2.4 哨兵Sentinel
 
 Redis 的主从复制主要用于实现数据的冗余备份和读分担，并不是为了提供高可用性。因此在系统高可用方面，单纯的主从架构无法很好的保证整个系统高可用。
 
@@ -393,7 +391,7 @@ redis-cli -p 26379 shutdown
 3. **网络分区**：发生网络分区（网络分裂）时，一部分节点可能与主节点失去联系；若此时主节点继续处理写操作，网络恢复之前这些操作可能不会被复制到从节点。
 4. **多个从节点同时故障**：所有从节点同时故障或在故障转移之前与主节点失联时，主节点故障时将没有可用的从节点来提升为主节点。
 
-### 2.5 集群部署（Cluster）
+### 2.5 集群Cluster
 
 Redis 集群是 Redis 的一种**分布式运行模式**，通过分片（sharding）提供数据的自动分区和管理，实现数据的高可用性和可扩展性。
 
@@ -506,8 +504,8 @@ Waiting for the cluster to join
 #### 2.5.4 集群数据读写
 
 ```shell
-# 连接一个主节点进行写数据
-redis-cli info replication
+# 连接任意一个主节点（不加 -c 时，key 不在当前节点的槽位会报 MOVED）
+redis-cli -h 192.168.75.129 -p 6379
 ```
 
 直接连接读写可能会报 `MOVED` 错误——因为不同节点的槽位不同，提示去对应节点写入：
@@ -552,7 +550,7 @@ redis-cli -p 6379 shutdown
 redis-cli -p 6380 shutdown
 ```
 
-### 2.6 文件目录与配置汇总
+### 2.6 文件目录与配置
 
 **文件目录：**
 
@@ -572,36 +570,44 @@ redis-cli -p 6380 shutdown
 | 哨兵 | `sentinel.conf` | `/opt/software/redis/redis-stable` |
 | 集群 | `cluster/redis_6379.conf`、`cluster/redis_6380.conf` | `/opt/software/redis/redis-stable/cluster` |
 
-## 3. Redis数据类型
+## 3. Redis 数据类型与常用命令
 
-### 3.1 五种常用数据类型介绍
+> 完整命令列表参考官方文档：https://redis.io/docs/latest/commands/
 
-Redis存储的是key-value结构的数据，其中key是字符串类型，value有5种常用的数据类型：
+### 3.1 数据类型总览
 
+Redis 存储的是 key-value 结构的数据，其中 key 是字符串类型，value 分为 5 种常用数据类型和 4 种扩展数据类型。
+
+**常用数据类型：**
+<img src="./redis.assets/image-20221130190150749.png" alt="五种常用数据类型特点速览" style="zoom:50%;" />
 - 字符串 string
 - 哈希 hash
 - 列表 list
 - 集合 set
 - 有序集合 sorted set / zset
 
-### 3.2 各种数据类型特点
+**扩展数据类型：**
 
-<img src="./redis.assets/image-20221130190150749.png" alt="image-20221130190150749" style="zoom:50%;" /> 
+- 位图 bitmap（基于 String，按位标记 0/1）
+- 基数统计 HyperLogLog（基于 String，概率型去重计数）
+- 地理位置 Geo（底层 ZSet，存储经纬度）
+- 消息流 stream（Redis 5.0 引入，消息队列）
 
-**解释说明：**
+**数据类型一览：**
 
-- 字符串(string)：普通字符串，Redis中最简单的数据类型
-- 哈希(hash)：也叫散列，类似于Java中的HashMap结构
-- 列表(list)：按照插入顺序排序，可以有重复元素，类似于Java中的LinkedList
-- 集合(set)：无序集合，没有重复元素，类似于Java中的HashSet
-- 有序集合(sorted set/zset)：集合中每个元素关联一个分数(score)，根据分数升序排序，没有重复元素
+| 类型 | 底层实现 | 特点 | 典型场景 | 类似 Java 结构 |
+| --- | --- | --- | --- | --- |
+| string | 动态字符串 SDS | 最基础类型，可存文本/数字/二进制 | 缓存、计数器、分布式锁 | String |
+| hash | 哈希表（小数据量用压缩列表） | field-value 映射 | 对象缓存 | HashMap |
+| list | 快速列表 quicklist | 有序、可重复，双端操作 | 消息队列、列表 | LinkedList |
+| set | 哈希表（全整数小集合用整数集合） | 无序、不重复 | 标签、点赞、共同关注 | HashSet |
+| zset | 跳表 + 哈希表（小数据量用压缩列表） | 不重复、带 score 排序 | 排行榜 | TreeMap + 跳表 |
+| bitmap | 基于 String | 按位存 0/1，极省内存 | 签到、在线状态、布隆过滤器 | BitSet |
+| HyperLogLog | 基于 String | 概率型基数统计，误差约 0.81%，固定约 12KB | UV 统计 | — |
+| Geo | 基于 ZSet | geohash 编码存经纬度 | 附近的人/商家、距离计算 | — |
+| stream | radix tree（基数树） | 消息流，支持消费者组、ACK | 消息队列 | — |
 
-
-## 4. Redis常用命令
-
-https://redis.io/docs/latest/commands/
-
-### 4.1 字符串操作命令
+### 3.2 string 字符串
 
 Redis 中字符串类型常用命令：
 
@@ -650,7 +656,7 @@ OK
 
 > 原子加减常用在点赞数、库存、访问量等计数场景：`INCR` 系列命令是原子的，在高并发下不会出现数据错乱。
 
-### 4.2 哈希操作命令
+### 3.3 hash 哈希
 
 Redis hash 是一个string类型的 field 和 value 的映射表，hash特别适合用于存储对象，常用命令：
 
@@ -707,7 +713,7 @@ email
 
 > 对象缓存场景：`HSET user:1001 name roy balance 1888`，一个 key 存一个对象的多个字段，比用 String 拼 JSON 更省内存、读写更高效。
 
-### 4.3 列表操作命令
+### 3.4 list 列表
 
 Redis 列表是简单的字符串列表，按照插入顺序排序，常用命令：
 
@@ -754,7 +760,7 @@ e
 
 > 组合玩法：栈（Stack）= LPUSH + LPOP；队列（Queue）= LPUSH + RPOP；阻塞队列（Blocking MQ）= LPUSH + BRPOP。常见应用：视频列表、签到列表、排队叫号、简化版消息队列。
 
-### 4.4 集合操作命令
+### 3.5 set 集合
 
 Redis set 是string类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据，常用命令：
 
@@ -804,7 +810,7 @@ a
 
 > 典型应用：微信抽奖（SADD 参与 + SRANDMEMBER/SPOP 抽奖）、点赞/收藏/标签（SADD/SREM/SISMEMBER/SCARD）、社交关系（SINTER 共同关注、SDIFF 推荐好友）。
 
-### 4.5 有序集合操作命令
+### 3.6 zset 有序集合
 
 Redis有序集合是string类型元素的集合，且不允许有重复成员。每个元素都会关联一个double类型的分数，集合根据分数升序排序。常用命令：
 
@@ -951,7 +957,196 @@ zhangsan
 
 > 典型应用：排行榜（ZINCRBY 点击/热度 +1，ZREVRANGE 取 TopN）、热搜榜、游戏积分榜。
 
-### 4.6 通用命令
+### 3.7 bitmap 位图
+
+Bitmap（位图）并不是一种新的数据类型，而是基于 **String** 类型实现的一组"位"操作：字符串的每个字节会被拆成 8 个 bit（二进制位），可以用一个 bit 表示一种状态（0 或 1），因此在"状态标记"类场景下比 String/Set 等类型节省大量内存。offset 从 0 开始，一个 key 最多可以存 2^32-1 个 bit（约 512MB）。
+
+```
+key  →  [ 0 | 1 | 0 | 0 | 0 | ... ]
+offset:  0   1   2   3   4
+```
+
+- **SETBIT** key offset value                    将 key 对应二进制数组 offset 位置的值设为 value（value 只能是 0 或 1）
+- **GETBIT** key offset                           返回 key 对应二进制数组 offset 位置的值（0 或 1）
+- **BITCOUNT** key [start end [BYTE|BIT]]      统计二进制数组中值为 1 的 bit 个数（可限定字节/位范围）
+- **BITPOS** key bit [start [end [BYTE|BIT]]] 返回二进制数组中第一个值为 bit（0/1）的 offset 位置
+- **BITOP** AND|OR|XOR|NOT destkey key [key ...]  对多个 bitmap 做位运算（与/或/异或/非），结果存入 destkey
+
+**命令示例：**
+
+```shell
+> setbit bits:demo 0 1        # 将第 0 位设为 1，返回该位原来的值
+0
+> setbit bits:demo 3 1
+0
+> getbit bits:demo 0          # 查看第 0 位的值
+1
+> getbit bits:demo 1          # 第 1 位未设置，为 0
+0
+> bitcount bits:demo          # 统计值为 1 的位个数
+2
+> bitpos bits:demo 1          # 第一个值为 1 的位
+0
+> bitpos bits:demo 0          # 第一个值为 0 的位
+1
+> setbit bits:demo 100 1      # offset 超过 1 字节时，字符串自动扩展
+0
+> strlen bits:demo            # 底层仍是字符串：100/8=12.5 → 13 字节
+13
+> bitcount bits:demo
+3
+```
+
+**每日签到场景（对应课程案例）：**
+
+![1792160889506](Redis.assets/1792160889506.png)
+
+```shell
+> setbit dailycheck:1 100 1   # 1号用户第100天完成了签到
+0
+> bitcount dailycheck:1       # 统计1号用户的签到次数
+1
+> bitpos dailycheck:1 1       # 第一次签到的位置（即第100天）
+100
+```
+
+**BITOP 位运算示例（统计连续在线用户）：**
+
+```shell
+> setbit online:monday 1 1    # 周一在线用户 id=1
+0
+> setbit online:monday 2 1
+0
+> setbit online:tuesday 2 1   # 周二在线用户 id=2
+0
+> setbit online:tuesday 3 1
+0
+> bitop and online:common online:monday online:tuesday   # 周一周二都在线的用户
+1
+> getbit online:common 2      # id=2 两天都在线
+1
+> getbit online:common 1      # id=1 仅周一在线
+0
+```
+布隆过滤器 不存在，一定不存在；如果存在，则有可能存在，需要查库！！！
+
+> 典型应用：每日签到（SETBIT 按天置位 + BITCOUNT 统计签到次数、BITPOS 找首次签到）优点：**快速、高效、节省空间**——1 个用户一年签到只需 365 bit ≈ 46 字节，1000 万用户在线状态仅需约 1.25MB。
+> 
+> 用户在线/活跃统计（BITOP 位运算求交集）
+> 
+> 布隆过滤器雏形。
+
+### 3.8 Hyperloglog 基数统计
+
+HyperLogLog 是一种**概率型数据结构**，用于统计一个集合中不重复元素的个数（基数统计），典型应用场景是根据用户访问记录统计网站的 UV。它不存储元素本身，固定占用约 12KB 内存，标准误差约 0.81%，以极小的误差换取了巨大的内存节省。
+
+- **PFADD** key element [element ...]          向 HyperLogLog 添加一个或多个元素（重复元素自动去重）
+- **PFCOUNT** key [key ...]                    统计 HyperLogLog 中不重复元素的个数（可传多个 key 合并统计）
+- **PFMERGE** destkey sourcekey [sourcekey ...]   将多个 HyperLogLog 数据整合成一条记录，存入 destkey
+
+**命令示例：**
+
+```shell
+> pfadd visitlog 192.168.65.111 192.168.65.112 192.168.65.111   # 添加用户访问记录（重复 IP 自动去重）
+1
+> pfadd visitlog 192.168.65.113
+1
+> pfcount visitlog                                              # 统计不同的独立访客（UV）
+3
+> pfadd visitlog:day1 192.168.65.111 192.168.65.112            # 第一天访问记录
+1
+> pfadd visitlog:day2 192.168.65.112 192.168.65.113            # 第二天访问记录
+1
+> pfmerge visitlog:week visitlog:day1 visitlog:day2            # 将多天记录合并成一条
+OK
+> pfcount visitlog:week                                         # 整周独立访客数
+3
+```
+
+> 典型应用：网站 UV 统计、注册 IP 数统计、关键词去重计数等海量去重统计场景。内存极小（固定约 12KB）、统计极快，但结果有约 0.81% 的标准误差；需要精确去重计数时应改用 Set。
+
+### 3.9 Geo 地理位置
+
+Geo 类型用于存储地理位置信息（经度、纬度），底层实现是 ZSet（分数为 geohash 编码），常用来实现"附近的人 / 商家 / 景点"等 LBS 场景。
+
+![1792160864260](Redis.assets/1792160864260.png)
+
+- **GEOADD** key [NX|XX] [CH] longitude latitude member [longitude latitude member ...]   添加一个或多个地点（参数顺序：经度 纬度 成员名）
+- **GEOPOS** key member [member ...]          返回一个或多个地点的经纬度
+- **GEODIST** key member1 member2 [M|KM|FT|MI]    计算两个地点之间的距离（单位默认 m）
+- **GEORADIUS** key longitude latitude radius M|KM|FT|MI [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count [ANY]] [ASC|DESC] [STORE key|STOREDIST key]    以指定经纬度为圆心、radius 为半径查询附近地点（Redis 6.2+ 已不推荐，改用 GEOSEARCH）
+- **GEOSEARCH** key FROMMEMBER member|FROMLONLAT longitude latitude BYRADIUS radius M|KM|FT|MI|BYBOX width height M|KM|FT|MI [ASC|DESC] [COUNT count [ANY]] [WITHCOORD] [WITHDIST] [WITHHASH]    按"圆心+半径"或"矩形框"搜索附近地点（Redis 6.2+ 推荐）
+
+**命令示例（添加长沙商家地址）：**
+
+```shell
+> geoadd changsha 113.017489 28.200454 火车站                 # 添加地点：经度 纬度 成员名
+1
+> geoadd changsha 112.96903 28.201195 橘子洲 113.017031 28.199706 赛格广场 113.017004 28.197677 国储
+3
+> geopos changsha 火车站                                       # 返回地点的经纬度
+> geodist changsha 火车站 橘子洲 m                            # 计算两个地点之间的距离（单位 M|KM|FT|MI，默认 m）
+> geosearch changsha frommember 火车站 byradius 2 km withdist withcoord   # 查找火车站 2km 范围内的地点
+```
+
+> 典型应用：附近的人/商家/景点（GEOADD 存坐标 + GEOSEARCH 按半径或矩形框搜索）、两点距离计算（GEODIST）。经纬度可通过百度地图坐标拾取器获取：https://api.map.baidu.com/lbsapi/getpoint/index.html。注意 GEORADIUS / GEORADIUSBYMEMBER 在 Redis 6.2+ 已不推荐，统一用 GEOSEARCH 替代。
+
+### 3.10 stream 流
+
+Stream 是 Redis 5.0 引入的**消息队列**类型，被称为"Redis 版的 MQ"——兼具**阻塞队列 + pub/sub** 的能力，支持消息持久化、消费者组、ACK 确认。企业应用相对较少（生产环境一般直接用 Kafka、RabbitMQ 等专业 MQ）。
+
+![1792160372912](Redis.assets/1792160372912.png)
+
+- **XADD** key [NOMKSTREAM] [MAXLEN|MINID [=|~] threshold [LIMIT count]] *|id field value [field value ...]    往队列末尾发布一条消息（`*` 表示让系统自动生成 ID）
+- **XDEL** key id [id ...]                            删除队列中的一条或多条消息
+- **XLEN** key                                        获取队列的长度
+- **XRANGE** key start end [COUNT count]              按 ID 范围查询队列中的消息（`-` 表示队首，`+` 表示队尾）
+- **XGROUP** CREATE key group id|$ [MKSTREAM]         创建消费者组（`0` 从队列头部开始消费，`$` 从队列尾部即新消息开始消费）
+- **XREADGROUP** GROUP group consumer [COUNT count] STREAMS key >|id    消费者组读取消息（`>` 表示从第一条未被消费过的消息消费，也可以指定具体 ID）
+- **XPENDING** key group                              查看消费者组的消费进度（待确认消息）
+
+**命令示例：**
+
+```shell
+> xadd mystream * name loulan name roy name admin   # 创建队列并添加消息，* 由系统自动生成 ID（毫秒时间戳-序号）
+"1713000000000-0"
+> xlen mystream                                     # 获取队列长度
+1
+> xrange mystream - +                               # 查看队列全部消息（- 队首，+ 队尾）
+"1713000000000-0"
+name
+loulan
+name
+roy
+name
+admin
+> xadd mystream * name zhang
+"1713000001000-0"
+> xgroup create mystream groupA 0                   # 创建消费者组 groupA，0 表示从队头开始消费（$ 则只消费新消息）
+OK
+> xreadgroup group groupA consumer1 count 2 streams mystream >   # consumer1 从第一条未被消费的消息开始消费 2 条
+1) 1) "mystream"
+   2) 1) 1) "1713000000000-0"
+         2) 1) "name"
+            2) "loulan"
+            3) "name"
+            4) "roy"
+            5) "name"
+            6) "admin"
+      2) 1) "1713000001000-0"
+         2) 1) "name"
+            2) "zhang"
+> xpending mystream groupA                           # 查看消费进度（2 条待确认）
+1) (integer) 2
+2) "1713000000000-0"
+3) "1713000001000-0"
+4) 1) 1) "consumer1"
+      2) "2"
+```
+
+> 典型应用：轻量级消息队列、事件流日志。相比 List 阻塞队列和 pub/sub，Stream 支持消息回溯、消费者组独立消费、消费确认（XACK），可靠性更高；课程定位"了解即可"，企业中一般直接用 Kafka / RabbitMQ。
+
+### 3.10 通用命令
 
 Redis的通用命令是不分数据类型的，都可以使用的命令：
 
@@ -974,9 +1169,10 @@ Redis的通用命令是不分数据类型的，都可以使用的命令：
 `-2`：表示该 `key` 不存在，或者已经过期。
 
 正数：表示该 `key` 还剩余的存活秒数。
-## 5.在Java中操作Redis
 
-### 5.1 Redis的Java客户端
+## 4. 在 Java 中操作 Redis
+
+### 4.1 Redis 的 Java 客户端
 
 前面我们讲解了Redis的常用命令，这些命令是我们操作Redis的基础，那么我们在java程序中应该如何操作Redis呢？这就需要使用Redis的Java客户端，就如同我们使用JDBC操作MySQL数据库一样。
 
@@ -990,9 +1186,9 @@ Spring 对 Redis 客户端进行了整合，提供了 Spring Data Redis，在Spr
 
 我们重点学习**Spring Data Redis**。
 
-### 5.2 Spring Data Redis使用方式
+### 4.2 Spring Data Redis 使用方式
 
-#### 5.2.1 介绍
+#### 4.2.1 介绍
 
 Spring Data Redis 是 Spring 的一部分，提供了在 Spring 应用中通过简单的配置就可以访问 Redis 服务，对 Redis 底层开发包进行了高度封装。在 Spring 项目中，可以使用Spring Data Redis来简化 Redis 操作。
 
@@ -1019,7 +1215,7 @@ Spring Data Redis中提供了一个高度封装的类：**RedisTemplate**，对�
 
 
 
-#### 5.2.2 环境搭建
+#### 4.2.2 环境搭建
 
 进入到sky-server模块
 
@@ -1096,11 +1292,34 @@ public class RedisConfiguration {
 
 **解释说明：**
 
-当前配置类不是必须的，因为 Spring Boot 框架会自动装配 RedisTemplate 对象，但是默认的key序列化器为
+当前配置类不是必须的，因为 Spring Boot 框架会自动装配 RedisTemplate 对象。但默认的 key 序列化器为 `JdkSerializationRedisSerializer`，会把 key 序列化成带二进制前缀的不可读内容，导致存到 Redis 中后的数据和原始数据有差别，因此需要设置为 `StringRedisSerializer`。
 
-JdkSerializationRedisSerializer，导致我们存到Redis中后的数据和原始数据有差别，故设置为
+**补充：RedisTemplate 中文乱码 / 序列化问题**
 
-StringRedisSerializer序列化器。
+上面的配置只设置了 key 的序列化器，value 仍使用默认的 `JdkSerializationRedisSerializer`（中文会变成不可读的二进制内容）。如果 value 直接存字符串，建议 key、value 都用 `StringRedisSerializer`；如果 value 存 Java 对象，推荐用 `GenericJackson2JsonRedisSerializer` 序列化为 JSON：
+
+```java
+@Bean
+public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    redisTemplate.setConnectionFactory(redisConnectionFactory);
+
+    StringRedisSerializer stringSerializer = new StringRedisSerializer();
+    GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
+
+    // key、hashKey 用字符串序列化，保证 Redis 中可读
+    redisTemplate.setKeySerializer(stringSerializer);
+    redisTemplate.setHashKeySerializer(stringSerializer);
+    // value 存对象用 JSON 序列化（纯字符串场景可直接用 StringRedisSerializer）
+    redisTemplate.setValueSerializer(jsonSerializer);
+    redisTemplate.setHashValueSerializer(jsonSerializer);
+
+    redisTemplate.afterPropertiesSet();
+    return redisTemplate;
+}
+```
+
+> 注意：`GenericJackson2JsonRedisSerializer` 要求被序列化对象存在无参构造；若 value 只存字符串，把 `setValueSerializer` 换成 `StringRedisSerializer` 即可。
 
 
 **4). 通过RedisTemplate对象操作Redis**
@@ -1146,12 +1365,28 @@ public class SpringDataRedisTest {
 上述环境搭建完毕后，接下来，我们就来具体对常见5种数据类型进行操作。
 
 
-#### 5.2.3 操作常见类型数据
+#### 4.2.3 操作常见类型数据
+
+**RedisTemplate 操作接口与数据类型对应关系：**
+
+| 操作接口 | 对应数据类型 |
+| --- | --- |
+| `opsForValue()` | string（bitmap 也通过它的 `setBit()` / `getBit()` 操作） |
+| `opsForHash()` | hash |
+| `opsForList()` | list |
+| `opsForSet()` | set |
+| `opsForZSet()` | zset 有序集合 |
+| `opsForGeo()` | Geo 地理位置 |
+| `opsForHyperLogLog()` | HyperLogLog 基数统计 |
+| `opsForStream()` | stream 消息流 |
+| `delete()` / `hasKey()` / `keys()` / `type()` 等 | 通用命令 |
+
+> bitmap 没有独立的操作接口，位操作通过 `opsForValue().setBit()`、`getBit()` 完成；这也是 RedisTemplate 中 bit 没有单独 opsFor 类型的原因。
 
 **1). 操作字符串类型数据**
 
 ```java
-	/**
+    /**
      * 操作字符串类型的数据
      */
     @Test
@@ -1171,7 +1406,7 @@ public class SpringDataRedisTest {
 **2). 操作哈希类型数据**
 
 ```java
-	/**
+    /**
      * 操作哈希类型的数据
      */
     @Test
@@ -1201,7 +1436,7 @@ public class SpringDataRedisTest {
 **3). 操作列表类型数据**
 
 ```java
-	/**
+    /**
      * 操作列表类型的数据
      */
     @Test
@@ -1227,7 +1462,7 @@ public class SpringDataRedisTest {
 **4). 操作集合类型数据**
 
 ```java
-	/**
+    /**
      * 操作集合类型的数据
      */
     @Test
@@ -1259,7 +1494,7 @@ public class SpringDataRedisTest {
 **5). 操作有序集合类型数据**
 
 ```java
-	/**
+    /**
      * 操作有序集合类型的数据
      */
     @Test
@@ -1284,7 +1519,7 @@ public class SpringDataRedisTest {
 **6). 通用命令操作**
 
 ```java
-	/**
+    /**
      * 通用命令操作
      */
     @Test
@@ -1306,32 +1541,33 @@ public class SpringDataRedisTest {
 
 ```
 
-## 6. Spring Boot 整合 Redis（实战）
+### 4.3 生产环境配置要点
 
-### 6.1 依赖引入
+4.2 的环境搭建基于教学项目（sky-server）。标准 Spring Boot 项目中，不需要自定义 `sky.redis.*` 前缀再用 `${}` 占位符引用，直接使用官方标准前缀即可。
 
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
-```
+> **配置前缀版本说明：** Spring Boot 2.x 使用 `spring.redis.*`，Spring Boot 3.x 起改为 `spring.data.redis.*`，注意与自己的 Boot 版本对应。
 
-### 6.2 增加配置
+**1）依赖**
+
+即 4.2.1 引入的 `spring-boot-starter-data-redis`，无需重复引入。
+
+**2）标准配置（application.yml）**
 
 ```yaml
 spring:
   data:
     redis:
-      host: r-xxxx.redis.rds.aliyuncs.com # Redis的Host
-      port: 6379                          # Redis服务器连接端口
-      password: xxxx                      # Redis服务器连接密码（默认为空）
+      host: r-xxxx.redis.rds.aliyuncs.com   # Redis 的 Host
+      port: 6379                            # 连接端口
+      password: xxxx                        # 连接密码（默认为空）
+      database: 0                           # 数据库编号（默认 0-15）
 ```
 
-### 6.3 单元测试
+**3）连接验证（单元测试）**
 
 ```java
-import cn.hollis.NFTurbo.NfTurboApplication;
+// 启动类替换为自己项目的 Application 类
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1340,7 +1576,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {NfTurboApplication.class})
+@SpringBootTest(classes = {Application.class})
 public class RedisTest {
     @Autowired
     private RedisTemplate redisTemplate;
@@ -1349,15 +1585,12 @@ public class RedisTest {
     public void testRedisConnect() {
         redisTemplate.opsForValue().set("test", "test");
         Assert.assertTrue(redisTemplate.opsForValue().get("test").equals("test"));
-
-        if (redisTemplate.opsForValue().get("test").equals("test")) {
-            System.out.println("redis connect success");
-        }
+        System.out.println("redis connect success");
     }
 }
 ```
 
-测试相关依赖：
+测试相关依赖（JUnit 4 与 Spring Boot 3.x 兼容写法；直接使用 `spring-boot-starter-test` 时默认已含 JUnit 5）：
 
 ```xml
 <dependency>
@@ -1388,9 +1621,14 @@ public class RedisTest {
 </dependency>
 ```
 
-![1772936077937](./redis.assets/1772936077937.png)
+<img src="./redis.assets/1772936077937.png" alt="连接测试成功" style="zoom:50%;" />
 
-## 7. Redisson
+
+## 5. Redisson
+
+Redisson 是架设在 Redis 之上的 Java 驻内存数据网格（In-Memory Data Grid），提供了比 RedisTemplate 更丰富的分布式能力：**分布式锁**（可重入锁、公平锁、读写锁、RedLock）、分布式集合（Map/Set/Queue）、限流器（RRateLimiter）、延迟队列、布隆过滤器、分布式对象等。最常用的场景是**分布式锁**——内置看门狗（Watchdog）机制，在锁即将到期且业务未执行完时自动续期，避免锁提前过期。
+
+引入依赖：
 
 ```xml
 <!-- Redisson -->
@@ -1429,11 +1667,13 @@ spring:
         codec: !<org.redisson.codec.JsonJacksonCodec> {}
         transportMode: "NIO"
 ```
-## 8. 参考资料
-https://www.cnblogs.com/liuqingzheng/p/9831331.html
 
-https://github.com/tporadowski/redis/releases/
+## 6. 参考资料
 
-https://db-engines.com/en/
-
-https://redis.io/
+- [Redis 官方网站](https://redis.io/)
+- [Redis 官方命令文档](https://redis.io/docs/latest/commands/)
+- [Redis 中文网](https://www.redis.net.cn/)
+- [Redis Windows 版下载（tporadowski 维护，推荐）](https://github.com/tporadowski/redis/releases/)
+- [Redis Windows 旧版下载（microsoftarchive 归档）](https://github.com/microsoftarchive/redis/releases)
+- [DB-Engines 数据库流行度排名](https://db-engines.com/en/)
+- [Redis 教程博客（刘清政）](https://www.cnblogs.com/liuqingzheng/p/9831331.html)
