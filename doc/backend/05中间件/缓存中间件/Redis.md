@@ -605,68 +605,223 @@ https://redis.io/docs/latest/commands/
 
 Redis 中字符串类型常用命令：
 
-- **SET** key value 					         设置指定key的值
-- **GET** key                                        获取指定key的值
-- **SETEX** key seconds value         设置指定key的值，并将 key 的过期时间设为 seconds 秒
-- **SETNX** key value                        只有在 key    不存在时设置 key 的值
+- **SET** key value                               设置指定key的值
+- **GET** key                                     获取指定key的值
+- **SETEX** key seconds value              设置指定key的值，并将 key 的过期时间设为 seconds 秒
+- **SETNX** key value                         只有在 key 不存在时设置 key 的值
+- **MSET** key value [key value ...]        批量设置多个字符串键值对
+- **MGET** key [key ...]                      批量获取多个字符串键值
+- **APPEND** key value                       向 key 对应的 value 末尾追加字符串
+- **STRLEN** key                                获取字符串长度
+- **INCR** key                                    将 key 中存储的数字值加 1（原子操作）
+- **DECR** key                                    将 key 中存储的数字值减 1（原子操作）
+- **INCRBY** key increment                  将 key 中存储的数字值加上增量 increment
+- **DECRBY** key decrement                 将 key 中存储的数字值减去增量 decrement
 
 更多命令可以参考Redis中文网：https://www.redis.net.cn
 
+**命令示例：**
+
+```shell
+> set name zhangsan
+OK
+> get name
+zhangsan
+> mset name lisi age 18        # 批量存储
+OK
+> mget name age                # 批量获取
+lisi
+18
+> setex code 60 1234           # 设置值并指定 60 秒过期
+OK
+> setnx name wangwu            # name 已存在，设置失败返回 0
+0
+> append name " hello"         # 追加字符串，返回新字符串长度
+10
+> strlen name
+10
+> incr counter                 # 计数器自增
+1
+> incrby counter 10
+11
+> decr counter
+10
+```
+
+> 原子加减常用在点赞数、库存、访问量等计数场景：`INCR` 系列命令是原子的，在高并发下不会出现数据错乱。
 
 ### 4.2 哈希操作命令
 
 Redis hash 是一个string类型的 field 和 value 的映射表，hash特别适合用于存储对象，常用命令：
 
-- **HSET** key field value             将哈希表 key 中的字段 field 的值设为 value
-- **HGET** key field                       获取存储在哈希表中指定字段的值
-- **HDEL** key field                       删除存储在哈希表中的指定字段
-- **HKEYS** key                              获取哈希表中所有字段
-- **HVALS** key                              获取哈希表中所有值
+- **HSET** key field value                    将哈希表 key 中的字段 field 的值设为 value
+- **HSETNX** key field value               只有在字段 field 不存在时设置值
+- **HGET** key field                          获取存储在哈希表中指定字段的值
+- **HMSET** key field value [field value ...]   在一个哈希表 key 中存储多个键值对
+- **HMGET** key field [field ...]          批量获取哈希表 key 中多个 field 的值
+- **HDEL** key field [field ...]            删除存储在哈希表中的指定字段
+- **HLEN** key                                   返回哈希表 key 中字段的数量
+- **HKEYS** key                                 获取哈希表中所有字段
+- **HVALS** key                                 获取哈希表中所有值
+- **HGETALL** key                              获取哈希表 key 中所有的字段和值
+- **HINCRBY** key field increment       为哈希表 key 中字段 field 的值加上增量 increment
 
 <img src="./redis.assets/image-20221130193121969.png" alt="image-20221130193121969" style="zoom: 67%;" /> 
+
+**命令示例：**
+
+```shell
+> hset user name zhangsan
+1
+> hset user age 18
+1
+> hget user name
+zhangsan
+> hmset user phone 13800000000 email zs@qq.com
+OK
+> hmget user name age phone
+zhangsan
+18
+13800000000
+> hgetall user
+name
+zhangsan
+age
+18
+phone
+13800000000
+email
+zs@qq.com
+> hlen user
+4
+> hincrby user age 1             # 年龄 +1
+19
+> hkeys user
+name
+age
+phone
+email
+> hdel user email
+1
+```
+
+> 对象缓存场景：`HSET user:1001 name roy balance 1888`，一个 key 存一个对象的多个字段，比用 String 拼 JSON 更省内存、读写更高效。
 
 ### 4.3 列表操作命令
 
 Redis 列表是简单的字符串列表，按照插入顺序排序，常用命令：
 
-- **LPUSH** key value1 [value2]         将一个或多个值插入到列表头部
-- **LRANGE** key start stop                获取列表指定范围内的元素
-- **RPOP** key                                       移除并获取列表最后一个元素
-- **LLEN** key                                        获取列表长度
-- **BRPOP** key1 [key2 ] timeout       移出并获取列表的最后一个元素， 如果列表没有元素会阻塞列表直到等待超    时或发现可弹出元素为止
+- **LPUSH** key value [value ...]       将一个或多个值插入到列表头部（左端）
+- **RPUSH** key value [value ...]       将一个或多个值插入到列表尾部（右端）
+- **LPOP** key                               移除并获取列表第一个元素
+- **RPOP** key                               移除并获取列表最后一个元素
+- **LRANGE** key start stop              获取列表指定范围内的元素（0 ~ -1 表示全部）
+- **LINDEX** key index                       通过索引获取列表中的元素
+- **LLEN** key                                获取列表长度
+- **BLPOP** key [key ...] timeout      移出并获取列表的第一个元素，列表为空时阻塞等待 timeout 秒（timeout=0 一直阻塞）
+- **BRPOP** key [key ...] timeout      移出并获取列表的最后一个元素，列表为空时阻塞等待 timeout 秒
 
 <img src="./redis.assets/image-20221130193332666.png" alt="image-20221130193332666" style="zoom: 67%;" /> 
 
+**命令示例：**
 
+```shell
+> lpush list01 a b c d           # 依次从左端插入，最终顺序 d c b a
+4
+> rpush list01 e f               # 从右端插入
+6
+> lrange list01 0 -1             # 查看全部元素
+d
+c
+b
+a
+e
+f
+> lpop list01                    # 弹出左端元素
+d
+> rpop list01                    # 弹出右端元素
+f
+> llen list01
+4
+> lindex list01 0
+c
+> lrange list01 0 -1
+c
+b
+a
+e
+```
+
+> 组合玩法：栈（Stack）= LPUSH + LPOP；队列（Queue）= LPUSH + RPOP；阻塞队列（Blocking MQ）= LPUSH + BRPOP。常见应用：视频列表、签到列表、排队叫号、简化版消息队列。
 
 ### 4.4 集合操作命令
 
 Redis set 是string类型的无序集合。集合成员是唯一的，这就意味着集合中不能出现重复的数据，常用命令：
 
-- **SADD** key member1 [member2]            向集合添加一个或多个成员
-- **SMEMBERS** key                                         返回集合中的所有成员
-- **SCARD** key                                                  获取集合的成员数
-- **SINTER** key1 [key2]                                   返回给定所有集合的交集
-- **SUNION** key1 [key2]                                 返回所有给定集合的并集
-- **SREM** key member1 [member2]            移除集合中一个或多个成员
+- **SADD** key member [member ...]     向集合添加一个或多个成员（重复成员自动忽略）
+- **SREM** key member [member ...]     移除集合中一个或多个成员
+- **SMEMBERS** key                         返回集合中的所有成员
+- **SCARD** key                              获取集合的成员数
+- **SISMEMBER** key member              判断 member 是否存在于集合中
+- **SRANDMEMBER** key [count]          从集合中随机选出 count 个成员（不删除）
+- **SPOP** key [count]                       从集合中随机弹出 count 个成员（删除）
+- **SINTER** key [key ...]                    返回所有给定集合的交集
+- **SUNION** key [key ...]                   返回所有给定集合的并集
+- **SDIFF** key [key ...]                      返回第一个集合与其他集合的差集
 
 <img src="./redis.assets/image-20221130193532735.png" alt="image-20221130193532735" style="zoom: 67%;" /> 
 
+**命令示例：**
 
+```shell
+> sadd like:1001 u001 u002 u003    # 点赞集合
+3
+> sadd like:1001 u001              # 重复成员忽略，返回 0
+0
+> scard like:1001                  # 点赞人数
+3
+> sismember like:1001 u001         # 是否点过赞
+1
+> smembers like:1001
+u001
+u002
+u003
+> sadd A a b c
+3
+> sadd B b c d
+3
+> sinter A B                       # 交集 → 共同关注
+b
+c
+> sunion A B                       # 并集 → 朋友圈的人
+a
+b
+c
+d
+> sdiff A B                        # 差集 → 推荐好友（A 有而 B 没有）
+a
+```
+
+> 典型应用：微信抽奖（SADD 参与 + SRANDMEMBER/SPOP 抽奖）、点赞/收藏/标签（SADD/SREM/SISMEMBER/SCARD）、社交关系（SINTER 共同关注、SDIFF 推荐好友）。
 
 ### 4.5 有序集合操作命令
 
-Redis有序集合是string类型元素的集合，且不允许有重复成员。每个元素都会关联一个double类型的分数。常用命令：
+Redis有序集合是string类型元素的集合，且不允许有重复成员。每个元素都会关联一个double类型的分数，集合根据分数升序排序。常用命令：
 
-常用命令：
-
-- **ZADD** key score1 member1 [score2 member2]     向有序集合添加一个或多个成员
-- **ZRANGE** key start stop [WITHSCORES]                     通过索引区间返回有序集合中指定区间内的成员
-- **ZINCRBY** key increment member                              有序集合中对指定成员的分数加上增量 increment
-- **ZREM** key member [member ...]                                移除有序集合中的一个或多个成员
+- **ZADD** key score member [score member ...]    向有序集合添加一个或多个成员（带分数）
+- **ZRANGE** key start stop [WITHSCORES]          按分数升序返回指定索引区间内的成员
+- **ZREVRANGE** key start stop [WITHSCORES]      按分数降序返回指定索引区间内的成员
+- **ZSCORE** key member                               返回指定成员的分数
+- **ZINCRBY** key increment member                 对指定成员的分数加上增量 increment
+- **ZCARD** key                                          获取有序集合的成员数
+- **ZRANK** key member                                 返回指定成员的排名（升序，从 0 开始）
+- **ZREM** key member [member ...]                移除有序集合中的一个或多个成员
+- **ZUNIONSTORE** destkey numkeys key [key ...]   计算多个有序集合的并集并存入 destkey
+- **ZINTERSTORE** destkey numkeys key [key ...]   计算多个有序集合的交集并存入 destkey
 
 <img src="./redis.assets/image-20221130193951036.png" alt="image-20221130193951036" style="zoom: 67%;" /> 
 
+**完整命令演示（字符串 → 哈希 → 列表 → 集合 → 有序集合串联演练）：**
 
 ```shell
 > 127.0.0.1@6379 connected!
@@ -794,30 +949,31 @@ zhangsan
 99
 ```
 
+> 典型应用：排行榜（ZINCRBY 点击/热度 +1，ZREVRANGE 取 TopN）、热搜榜、游戏积分榜。
 
 ### 4.6 通用命令
 
 Redis的通用命令是不分数据类型的，都可以使用的命令：
 
-- KEYS pattern 		查找所有符合给定模式( pattern)的 key 
-- EXISTS key 		检查给定 key 是否存在
-- TYPE key 		返回 key 所储存的值的类型
-- DEL key 		该命令用于在 key 存在是删除 key
+- KEYS pattern         查找所有符合给定模式( pattern)的 key 
+- EXISTS key           检查给定 key 是否存在
+- TYPE key             返回 key 所储存的值的类型
+- DEL key              该命令用于在 key 存在是删除 key
+- RENAME key newkey    重命名 key
+- PING                 测试连接
+- EXPIRE key seconds   设置 key 的存活时间（秒）
+- TTL key              查看 key 剩余存活时间
+- SELECT index         切换数据库（默认 16 个库，0-15）
+- DBSIZE               统计当前库 key 数量
+- FLUSHDB              清空当前库
 
-- rename key newkey 重命名
-
-- `ping`（测试连接）
-
-- `expire key 秒数`（设置存活时间）
-
-- `ttl key`（查看剩余存活时间）
+**TTL 返回值的含义：**
 
 `-1`：表示该 `key` 存在但没有设置过期时间（永久有效）。
 
 `-2`：表示该 `key` 不存在，或者已经过期。
 
 正数：表示该 `key` 还剩余的存活秒数。
-
 ## 5.在Java中操作Redis
 
 ### 5.1 Redis的Java客户端

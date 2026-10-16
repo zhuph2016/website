@@ -15,6 +15,16 @@ const WHITE_LIST = [
 // 判断是否是文件夹
 const isDirectory = (path) => fs.lstatSync(path).isDirectory();
 
+// 过滤规则：白名单精确匹配 + 排除 *.assets 图片资源目录 + 排除隐藏目录
+// （*.assets 是 Typora 导入图片时在文档旁生成的图片文件夹，不应出现在侧边栏）
+const filterEntries = (files) =>
+  files.filter(
+    (name) =>
+      !WHITE_LIST.includes(name) &&
+      !name.startsWith(".") &&
+      !name.endsWith(".assets")
+  );
+
 // 取差值（保持传入顺序）
 const intersections = (arr1, arr2) => {
   const exclude = new Set(arr2);
@@ -43,10 +53,7 @@ function getList(params, path1, pathname) {
     if (isDir) {
       // 如果是文件夹,读取之后作为下一次递归参数（递归时同样过滤白名单，
       // 否则子目录里的 index.md 会变成侧边栏里一个叫 "index" 的条目）
-      const files = intersections(
-        sortEntries(fs.readdirSync(dir)),
-        WHITE_LIST
-      );
+      const files = filterEntries(sortEntries(fs.readdirSync(dir)));
       const subPath = `${pathname}/${params[file]}`;
       const items = getList(files, dir, subPath);
 
@@ -94,7 +101,7 @@ export const set_sidebar = (pathname) => {
   // 读取pathname下的所有文件或者文件夹，并显式排序保证构建可复现
   const files = sortEntries(fs.readdirSync(dirPath));
   // 过滤掉
-  const items = intersections(files, WHITE_LIST);
+  const items = filterEntries(files);
   // getList 函数后面会讲到
   return getList(items, dirPath, pathname);
 };

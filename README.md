@@ -23,7 +23,7 @@ website/
 │   ├── ai/                     # AI 技术区（收藏 ai + VitePress 使用参考）
 │   └── other/                  # 杂项（源码/博客/数据结构/算法/开源项目）
 ├── public/                     # 静态资源
-│   ├── images/                 # 站点图片（background/logo + 各主题 <主题>.assets 目录）
+│   ├── images/                 # 站点级图片（仅 background/logo；文档专属图在各 md 同级 <主题>.assets/）
 │   └── football-home.png       # 首页 Hero 图标（透明 PNG）
 ├── .vitepress/
 │   ├── config.mts              # 站点配置（导航/侧边栏/搜索）
@@ -56,7 +56,8 @@ npm run preview
 
 - **新增项目页**：在 `doc/projects/` 下创建目录与 Markdown 文件，并在 `index.md`（首页卡片）与 `.vitepress/config.mts`（导航）中补充链接。
 - **图片规范**：
-  - 项目截图等图片统一放在 `public/images/<主题>.assets/` 目录，目录命名使用**小写 kebab-case**（如 `seata.assets`、`mybatis-plus.assets`），禁止大小写混用（Linux 构建环境区分大小写）。
-  - 文档内引用使用相对路径：`../../public/images/<主题>.assets/<文件>`（层级按文档所在目录深度调整）。
-  - 站点级资源（logo/背景）引用 `/images/...` 绝对路径。
+  - 文档专属图片（截图等）放在对应 Markdown **同级的 `<主题>.assets/` 目录**（如 `redis.assets`），目录命名**小写 kebab-case**（如 `seata.assets`、`mybatis-plus.assets`），禁止大小写混用（Linux 构建环境区分大小写）。
+  - 文档内引用使用相对路径：`./<主题>.assets/<文件>`（如 `![x](./redis.assets/a.png)`），本地编辑器与站点构建均可正常显示。
+  - 站点级共享资源（logo/背景）放 `public/images/`，引用 `/images/...` 绝对路径。
+  - `.assets` 目录已由 `auto_sidebar.mjs` 自动排除，不会出现在网站侧边栏。
 - **侧边栏**：`doc/frontend/`、`doc/backend/`、`doc/projects/`、`doc/interview/`、`doc/ai/`、`doc/other/` 均通过 `auto_sidebar.mjs` 自动生成，新增 Markdown 文件后会自动出现，无需手动维护。
