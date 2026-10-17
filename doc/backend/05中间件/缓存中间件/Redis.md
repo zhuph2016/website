@@ -4,7 +4,7 @@
 
 ### 1.1 简介
 
-Redis（Remote Dictionary Server）是一个基于**内存**的 key-value 结构数据库，使用 C 语言开发、开源、高性能，官方数据可达 100000+ QPS（每秒查询次数），是互联网技术领域应用最广泛的**存储中间件**。它存储的 value 类型比较丰富，也被称为结构化的 NoSql 数据库。
+Redis 全称 **REmote DIctionary Server**（远程字典服务），是一个完全开源的、高性能的 Key-Value 数据库。是一个基于**内存**的 key-value 结构数据库，使用 C 语言开发、开源、高性能，官方数据可达 100000+ QPS（每秒查询次数），是互联网技术领域应用最广泛的**存储中间件**。它存储的 value 类型比较丰富，也被称为结构化的 NoSql 数据库。
 
 **官网：** https://redis.io
 
@@ -34,6 +34,19 @@ NoSql（Not Only SQL），不仅仅是 SQL，泛指**非关系型数据库**。N
 - Redis
 - Mongo db
 - MemCached
+
+**深入理解**
+
+<img src="./redis.assets/redis_qa_official.png" alt="官网关于 Redis 的问答" style="zoom:50%;" />
+
+**核心总结：**
+
+- **数据结构复杂**：相比传统 K-V 型数据库，Redis 能够支撑更复杂的数据类型，已经远远超出了缓存的范围，可以实现很多复杂的业务场景，并且还在不断发展更多的业务场景；
+- **数据保存在内存，但是持久化到硬盘**：数据全部保存在内存，读写性能非常高，是集中式缓存的不二之选；数据又持久化到硬盘，意味着 Redis 上保存的数据非常安全，目前完全可以当做一个数据库来用。
+
+所以，官方对 Redis 的作用已经定位成三个方面：**Cache（缓存）**、**Database（数据库）**、**Vector Search（向量搜索）**。
+
+<img src="./redis.assets/redis_cloud_positioning.png" alt="Redis Cloud 官方定位截图" style="zoom:50%;" />
 
 ### 1.2 客户端连接
 
@@ -81,6 +94,25 @@ redis-cli.exe -h localhost -p 6379 -a 123456
 **连接成功** 
 
 <img src="./redis.assets/image-20221130192310916.png" alt="image-20221130192310916" style="zoom: 33%;" />  
+
+### 1.4 Redis 生态：2024 年的 Redis
+
+在 2023 年之前，Redis 是一个纯粹的开源数据库；近两年 Redis 正在进行华丽的蜕变，从一个缓存产品变成一整套生态服务。
+
+**产品与服务体系：**
+
+| 产品 | 说明 |
+| --- | --- |
+| Redis OSS | 传统开源服务体系（以前常用的开源体系） |
+| Redis Stack | 基于 Redis OSS 打造的更完整技术栈，在 OSS 功能基础上提供高级扩展功能 |
+| Redis Cloud | 云服务，基于 AWS、Azure 等公有云，提供一整套完整的企业服务 |
+| Redis Enterprise | 企业级收费产品服务 |
+| Redis Insight | Redis 官方推出的安装管理套件 / 图形化客户端 |
+
+**要点：**
+
+- **Redis Insight**：官方图形化客户端，以往使用 Redis 需要寻找各种第三方客户端，现在开箱即用；并且 Redis Insight 也可以在 Redis Cloud 上直接使用；
+- 功能层面目前形成了 **Redis OSS** 与 **Redis Stack** 两套服务体系：OSS 是传统开源体系，Stack 基于 OSS 打造、提供更高级的扩展功能（基于 Redis Cloud 提供服务）。
 
 ## 2. Redis部署
 
@@ -1625,8 +1657,277 @@ public class RedisTest {
 
 <img src="./redis.assets/1772936077937.png" alt="连接测试成功" style="zoom:50%;" />
 
+## 5. Redis线程模型
 
-## 5. Redisson
+> 参考《深入理解 Redis 线程模型》。核心结论：整体线程模型 = **客户端多线程 + 服务端核心单线程**，依靠复合指令、事务、Pipeline、Lua 脚本、Function 等机制保证指令原子性；同时要重点关注 Bigkey 对单线程模型造成的阻塞风险。
+
+### 5.1 Redis 到底是单线程还是多线程？
+
+这是 Redis 面试中最经典的问题，几乎伴随 Redis 的整个发展过程。一句话结论：**客户端多线程，服务端核心单线程**。
+
+#### 5.1.1 客户端多线程：维护 Socket 连接
+
+Redis 为了支撑大量客户端同时连接，使用**多线程维护与客户端的 Socket 连接**，`redis.conf` 中的 `maxclients` 控制最大连接数：
+
+```
+# 默认最大连接数 10000，超过后新连接会被拒绝
+maxclients 10000
+```
+
+#### 5.1.2 服务端单线程：主线程处理网络 IO 与键值读写
+
+服务端响应网络 IO 和键值对读写的请求，统一由一个**主线程**完成。Redis 基于 **epoll 实现 IO 多路复用**，让一个主线程同时响应多个客户端 Socket 连接的请求：
+
+- 并发请求被转成**串行执行** → 天然没有 MySQL 那种脏读、幻读、不可重复读的并发问题；
+- 串行化 + 基于内存工作的极高性能 → 让 Redis 成为很多并发问题的解决工具。
+
+#### 5.1.3 线程模型的版本演进
+
+| 版本 | 线程模型 |
+| --- | --- |
+| Redis 4.x 及以前 | 纯单线程 |
+| Redis 5.x（2018-10 核心重构） | 大重构为后台多线程机制打基础 |
+| Redis 6.x / 7.x | 引入全新多线程机制提升后台工作；网络 IO 支持 `io-threads` 多线程读写 |
+| Redis 7.x | RDB/AOF 持久化、`unlink` 异步删除、集群数据同步、`FLUSHALL` 异步等耗时操作都由额外线程执行 |
+
+```
+# redis.conf 中可配置网络 IO 线程数（默认关闭，建议 4 核以上机器开启）
+io-threads 4
+```
+
+现代 CPU 早已是多核架构，Redis 若一直单线程就无法发挥多核 CPU 的优势；且耗时操作必然影响主线程，所以**多线程是必然结果**，只不过为了保持快速，Redis 在多线程上走得非常谨慎。
+
+#### 5.1.4 为什么核心线程坚持单线程？
+
+1. **CPU 通常不是 Redis 的瓶颈**：性能瓶颈大部分是内存和网络，核心线程改多线程的要求并不急切；
+2. **减少上下文切换**：单线程避免了线程上下文切换的性能消耗；
+3. **避免资源竞争**：核心线程若改为多线程并发执行，必然带来资源竞争，极大增加业务复杂性，反而影响执行效率。
+
+### 5.2 Redis 如何保证指令原子性
+
+核心读写操作是单线程串行处理的，多个客户端同时读写只会排队串行。但**单条指令的原子性 ≠ 一个客户端多步操作的原子性**——针对单个客户端，Redis 并没有像 MySQL 事务那样保证同一客户端的操作整体原子性，多步操作之间仍可能被其他客户端的指令"加塞"。针对不同业务场景，Redis 提供了多种控制指令原子性的思路。
+
+#### 5.2.1 复合指令
+
+Redis 内部提供很多复合指令，一条指令干了多个指令的活，天然保持原子性：
+
+- `MSET` / `HMSET`：批量设置
+- `GETSET`：取值并赋新值
+- `SETNX`：不存在才设置（分布式锁的常用基础）
+- `SETEX`：设置值并指定过期时间
+
+```bash
+127.0.0.1:6379> MSET k1 v1 k2 v2
+OK
+```
+
+#### 5.2.2 Redis 事务（MULTI / EXEC）
+
+| 命令 | 作用 |
+| --- | --- |
+| `MULTI` | 开启事务 |
+| `EXEC` | 执行事务 |
+| `DISCARD` | 放弃事务 |
+| `WATCH` | 监听 key，key 有变化后事务不执行 |
+| `UNWATCH` | 取消监听（只在当前客户端生效） |
+
+```bash
+127.0.0.1:6379> MULTI
+OK
+127.0.0.1:6379(TX)> set k2 2
+QUEUED
+127.0.0.1:6379(TX)> incr k2
+QUEUED
+127.0.0.1:6379(TX)> get k2
+QUEUED
+127.0.0.1:6379(TX)> EXEC
+1) OK
+2) (integer) 3
+3) "3"
+```
+
+> 开启事务后，所有操作返回 `QUEUED`，表示只是排好了队，等到 `EXEC` 后一起执行。
+
+**Redis 事务 ≠ 数据库事务**：它**不保证事务中的指令一起成功或一起失败**，只保证事务中的原子操作**一起执行，不会被其他指令加塞**。
+
+```bash
+# lpop 是针对 list 的操作，现在对 string 类型的 k2 操作，必然报错
+127.0.0.1:6379(TX)> lpop k2
+QUEUED
+127.0.0.1:6379(TX)> incr k2
+QUEUED
+127.0.0.1:6379(TX)> EXEC
+1) OK
+2) (integer) 3
+3) "3"
+4) (error) WRONGTYPE Operation against a key holding the wrong kind of value
+5) (integer) 4
+6) "4"
+```
+
+可以看到：某条指令报错**不会让整个事务回滚，也不影响后面指令的执行**。
+
+**事务失败如何"回滚"——回滚的是操作，不是数据：**
+
+- 在 `EXEC` 执行前失败（指令敲错、参数不对）→ 整个事务的操作都不会执行；
+- 在 `EXEC` 执行后失败（如 key 类型不对）→ 事务中其他操作正常执行，不受影响。
+
+**执行过程中的注意点：**
+
+1. 只要客户端执行了 `EXEC`，之后即使连接断开，事务也会一直执行下去；
+2. 事务可能造成数据不一致：`EXEC` 后 Redis 先将事务中所有操作记录到 AOF 文件，再执行具体操作。若记录后、执行中服务非正常宕机（崩溃或被 kill -9），AOF 记录与数据不符，下次启动会报错，需用 `redis-check-aof` 工具修复（移除不完整的事务操作记录）；
+3. `WATCH` 机制可以进一步保证事务执行前某个 key 不被修改；`UNWATCH` 取消监听只在当前客户端有效。
+
+#### 5.2.3 Pipeline 管道
+
+**核心作用：优化 RTT（Round-Trip Time）**。RTT 指指令数据包从 Client → Server → Client 的往返时间，指令越频繁 RTT 消耗越可观。Pipeline 的思路简单明了：**将客户端多个指令打包，一起推送给服务端**，一次往返完成多笔操作。
+
+```bash
+# command.txt 中包含多条指令，一次管道批量执行
+[root@localhost ~]# cat command.txt | redis-cli -a 123qweasd --pipe
+All data transferred. Waiting for the last reply...
+Last reply received from server.
+errors: 0, replies: 4
+```
+
+**注意点：**
+
+1. **Pipeline 不具备原子性**：只是将多条命令发送到服务端，最终仍可能被其他客户端的指令加塞（虽然概率较小），所以不建议在 Pipeline 中做复杂的数据操作；
+2. 执行复合指令和事务会**阻塞其他命令执行**，而执行 Pipeline 不会；
+3. Pipeline 执行过程中会**阻塞当前客户端**，不建议拼装过多指令——指令过多会使客户端阻塞太久，且服务端需要回复繁忙客户端、占用大量内存；
+4. 适合在**非热点时段**做大批量数据调整任务（如批量写入）。
+
+#### 5.2.4 Lua 脚本（最常用）
+
+Redis 事务和 Pipeline 对原子性问题都有"水土不服"的地方，且都只是对现有指令进行拼凑，无法承载自定义复杂逻辑。因此企业中用到更多的是 **Lua 脚本**，也是 Redis 7 版本着重调整的功能。
+
+Lua 是一种小巧的脚本语言，最大特点是**单线程模型**，天然适合 Redis、Nginx 这类单线程中间件做功能定制——**在 Redis 中执行一段 Lua 脚本，天然就是原子性的**（Redis 7.x 支持 Lua 5.1）。
+
+**执行方式：**
+
+```bash
+# EVAL：script 为脚本，numkeys 指定键名参数个数，
+# KEYS[i] 访问键名参数，ARGV[i] 访问附加参数（均以 1 为基址）
+127.0.0.1:6379> eval "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}" 2 key1 key2 first second
+1) "key1"
+2) "key2"
+3) "first"
+4) "second"
+
+# 脚本内使用 redis.call() 调用 Redis 命令
+# 调整 1 号商品的库存：若库存小于 10 就设置为 10
+127.0.0.1:6379> set stock_1 1
+OK
+127.0.0.1:6379> eval "local initcount = redis.call('get', KEYS[1]) local a = tonumber(initcount) local b = tonumber(ARGV[1]) if a >= b then redis.call('set', KEYS[1], a) return 1 end redis.call('set', KEYS[1], b) return 0 " 1 "stock_1" 10
+(integer) 0
+127.0.0.1:6379> get stock_1
+"10"
+```
+
+**使用注意点：**
+
+1. **不要在脚本中出现死循环和耗时运算**，否则 Redis 会阻塞、不再接受其他命令（这一点与 Pipeline 不同，Pipeline 不会阻塞服务端）。Redis 有配置参数控制 Lua 脚本最长执行时间，**默认 5 秒**；超时后 Redis 对其他操作返回 `BUSY` 错误，此时只允许执行 `SCRIPT KILL`、`FUNCTION KILL`、`SHUTDOWN NOSAVE` 等少量命令：
+
+```
+# redis.conf：控制 EVAL 脚本、Function 的最大执行时间（默认 5000ms）
+lua-time-limit 5000
+# busy-reply-threshold 5000   # 旧名称，现在是别名
+```
+
+2. **尽量使用只读脚本**：只读脚本是 Redis 7 新增，表示不修改数据集的脚本，加只读标志后用 `EVAL_RO` 触发；不允许执行任何修改数据集的操作，可随时用 `SCRIPT KILL` 停止；好处是能限制某些用户的操作，且可转移到备份节点执行、减轻主节点压力；
+3. **热点脚本可以缓存到服务端**：`SCRIPT LOAD` 将脚本缓存到服务端并返回 SHA1 校验和，之后用 `EVALSHA` 直接执行，省去每次传输脚本内容：
+
+```bash
+127.0.0.1:6379> SCRIPT LOAD "return 'Immabe a cached script'"
+"c664a3bf70bd1d45c4284ffebb65a6f2299bfc9f"
+127.0.0.1:6379> EVALSHA c664a3bf70bd1d45c4284ffebb65a6f2299bfc9f 0
+"Immabe a cached script"
+```
+
+#### 5.2.5 Redis Function（Redis 7+）
+
+如果觉得开发 Lua 脚本有困难，Redis 7 之后提供了另一种解法——**Redis Function**：将一些功能声明成统一的函数，提前加载到 Redis 服务端（可由管理员加载），客户端直接调用即可，无需关心函数实现。
+
+**Function 更大的好处：Function 中可以嵌套调用其他 Function**，从而更有利于代码复用；相比之下 Lua 脚本无法复用。
+
+**示例**：在服务器上新增 `mylib.lua` 文件（注意：第一行是指定函数的命名空间，**不是注释，不能少**）：
+
+```lua
+#!lua name=mylib
+
+local function my_hset(keys, args)
+    local hash = keys[1]
+    local time = redis.call('TIME')[1]
+    return redis.call('HSET', hash, '_last_modified_', time, unpack(args))
+end
+
+redis.register_function('my_hset', my_hset)
+```
+
+加载并调用：
+
+```bash
+[root@localhost myredis]# cat mylib.lua | redis-cli -a 123qweasd -x FUNCTION LOAD REPLACE
+"mylib"
+127.0.0.1:6379> FUNCTION LIST
+1) 1) "library_name"
+   2) "mylib"
+   3) "engine"
+   4) "LUA"
+   5) "functions"
+   6) 1) 1) "name"
+      2) "my_hset"
+...
+127.0.0.1:6379> FCALL my_hset 1 myhash myfield "some value" another_field "another value"
+(integer) 3
+127.0.0.1:6379> HGETALL myhash
+1) "_last_modified_"
+2) "1717748001"
+3) "myfield"
+4) "some value"
+5) "another_field"
+6) "another value"
+```
+
+**Function 注意点：**
+
+1. Function 同样可以进行只读调用；
+2. 集群中使用时，目前版本需要在**各个节点手动加载一次**，Redis 不会在集群中自动同步；
+3. Function 缓存在服务端，不建议加载太多太大；
+4. Function 和 Script 一样有一系列管理指令，`help @scripting` 自行了解。
+
+#### 5.2.6 原子性机制对比
+
+| 机制 | 是否原子 | 特点 | 适用场景 |
+| --- | --- | --- | --- |
+| 复合指令 | 是 | 一条指令完成多步操作 | 简单批量读写 |
+| Redis 事务 | 是（一起执行不被加塞，但不回滚失败指令） | MULTI/EXEC 排队执行，支持 WATCH | 需要"不被加塞"的批量操作 |
+| Pipeline | 否 | 多命令打包发送，优化 RTT，不阻塞服务端 | 非热点时段大批量数据调整 |
+| Lua 脚本 | 是 | 可承载自定义复杂逻辑，天然原子 | 高并发复杂业务（最常用） |
+| Redis Function | 是 | 函数化、可嵌套复用，Redis 7+ | 替代复杂 Lua 脚本 |
+
+> 以上机制本质都是**改变 Redis 指令执行顺序**的方式。实际项目中 Lua 脚本通常用得最多，在很多追求极致性能的高并发场景中担任重要角色；但其他方式也需要了解，真实业务场景下才有更多方案可选。
+
+### 5.3 Redis 中的 Bigkey 问题
+
+**Bigkey** 指占用空间非常大的 key，例如一个 list 包含 200W 个元素，或一个 string 里放一篇文章。基于 Redis **单线程为主**的核心机制，操作这些 Bigkey 非常容易造成**服务阻塞**，实际项目中一定要特殊关照。
+
+Redis 客户端提供了两个扩展参数，帮助快速发现 Bigkey：
+
+```bash
+# 找出元素很多（复杂度高）的 key
+redis-cli --bigkeys
+# 找出占用内存很大的 key
+redis-cli --memkeys
+```
+
+### 5.4 线程模型总结
+
+1. Redis 整体还是**多线程**的，只是后台执行指令的**核心线程是单线程**，整个线程模型以单线程为主，不同客户端的各种指令依次排队执行；
+2. 这种以单线程为主的模型相比其他中间件非常简单，让 Redis 处理线程并发问题简单高效，甚至在很多复杂业务场景下成为**并发控制工具**；但这不意味着没有并发问题——**选择合理的指令执行方式**非常重要；
+3. 简单的线程模型本身**不利于发挥多线程的并发优势**，而 Redis 的应用场景又通常与高性能深度绑定，所以使用时要时刻思考指令执行方式（复合指令、事务、Pipeline、Lua、Function），才能最大限度发挥 Redis 高性能的优势。
+
+## 6. Redisson
 
 Redisson 是架设在 Redis 之上的 Java 驻内存数据网格（In-Memory Data Grid），提供了比 RedisTemplate 更丰富的分布式能力：**分布式锁**（可重入锁、公平锁、读写锁、RedLock）、分布式集合（Map/Set/Queue）、限流器（RRateLimiter）、延迟队列、布隆过滤器、分布式对象等。最常用的场景是**分布式锁**——内置看门狗（Watchdog）机制，在锁即将到期且业务未执行完时自动续期，避免锁提前过期。
 
@@ -1670,7 +1971,7 @@ spring:
         transportMode: "NIO"
 ```
 
-## 6. 参考资料
+## 7. 参考资料
 
 - [Redis 官方网站](https://redis.io/)
 - [Redis 官方命令文档](https://redis.io/docs/latest/commands/)
