@@ -64,6 +64,6 @@ public class SaTokenTest {
 }
 ```
 
-![1772936822650](./sa-token.assets/1772936822650.png)
+![1772936822650](./Sa-Token.assets/1772936822650.png)
 
 ## 

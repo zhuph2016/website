@@ -12,7 +12,7 @@ Redis 全称 **REmote DIctionary Server**（远程字典服务），是一个完
 
 **key-value 结构存储：**
 
-<img src="./redis.assets/image-20221130173459174.png" alt="key-value结构存储" style="zoom:50%;" />
+<img src="./Redis.assets/image-20221130173459174.png" alt="key-value结构存储" style="zoom:50%;" />
 
 **主要特点：**
 
@@ -37,7 +37,7 @@ NoSql（Not Only SQL），不仅仅是 SQL，泛指**非关系型数据库**。N
 
 **深入理解**
 
-<img src="./redis.assets/redis_qa_official.png" alt="官网关于 Redis 的问答" style="zoom:50%;" />
+<img src="./Redis.assets/redis_qa_official.png" alt="官网关于 Redis 的问答" style="zoom:50%;" />
 
 **核心总结：**
 
@@ -46,13 +46,13 @@ NoSql（Not Only SQL），不仅仅是 SQL，泛指**非关系型数据库**。N
 
 所以，官方对 Redis 的作用已经定位成三个方面：**Cache（缓存）**、**Database（数据库）**、**Vector Search（向量搜索）**。
 
-<img src="./redis.assets/redis_cloud_positioning.png" alt="Redis Cloud 官方定位截图" style="zoom:50%;" />
+<img src="./Redis.assets/redis_cloud_positioning.png" alt="Redis Cloud 官方定位截图" style="zoom:50%;" />
 
 ### 1.2 客户端连接
 
 **redis-cli.exe**
 
-<img src="./redis.assets/image-20221130182207020.png" alt="image-20221130182207020" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130182207020.png" alt="image-20221130182207020" style="zoom:50%;" /> 
 
 通过redis-cli.exe命令默认连接的是本地的redis服务，并且使用默认6379端口。也可以通过指定如下参数连接：
 
@@ -77,7 +77,7 @@ requirepass 123456
 redis-cli.exe -h localhost -p 6379 -a 123456
 ```
 
-<img src="./redis.assets/image-20221130183253539.png" alt="image-20221130183253539" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130183253539.png" alt="image-20221130183253539" style="zoom:50%;" /> 
 
 此时，-h 和 -p 参数可省略不写。
 
@@ -85,15 +85,15 @@ redis-cli.exe -h localhost -p 6379 -a 123456
 
 默认提供的客户端连接工具界面不太友好，同时操作也较为麻烦，接下来，引入一个Redis客户端图形工具。
 
-<img src="./redis.assets/image-20221130183746355.png" alt="image-20221130183746355" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130183746355.png" alt="image-20221130183746355" style="zoom:50%;" /> 
 
 **新建连接**
 
-<img src="./redis.assets/image-20221130192210418.png" alt="image-20221130192210418" style="zoom: 33%;" />  
+<img src="./Redis.assets/image-20221130192210418.png" alt="image-20221130192210418" style="zoom: 33%;" />  
 
 **连接成功** 
 
-<img src="./redis.assets/image-20221130192310916.png" alt="image-20221130192310916" style="zoom: 33%;" />  
+<img src="./Redis.assets/image-20221130192310916.png" alt="image-20221130192310916" style="zoom: 33%;" />  
 
 ### 1.4 Redis 生态：2024 年的 Redis
 
@@ -140,7 +140,7 @@ Redis安装包分为windows版和Linux版：
 
 Redis的Windows版属于绿色软件，直接解压即可使用，解压后目录结构如下：
 
-<img src="./redis.assets/image-20221130180657152.png" alt="image-20221130180657152" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130180657152.png" alt="image-20221130180657152" style="zoom:50%;" /> 
 
 **windows后台启动redis操作步骤**
 
@@ -161,7 +161,7 @@ redis-server --service-stop
 
 **redis-server.exe redis.windows.conf**
 
-<img src="./redis.assets/image-20221130181950351.png" alt="image-20221130181950351" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130181950351.png" alt="image-20221130181950351" style="zoom:50%;" /> 
 
 Redis服务默认端口号为 **6379** ，通过快捷键**Ctrl + C** 即可停止Redis服务
 
@@ -611,7 +611,7 @@ redis-cli -p 6380 shutdown
 Redis 存储的是 key-value 结构的数据，其中 key 是字符串类型，value 分为 5 种常用数据类型和 4 种扩展数据类型。
 
 **常用数据类型：**
-<img src="./redis.assets/image-20221130190150749.png" alt="五种常用数据类型特点速览" style="zoom:50%;" />
+<img src="./Redis.assets/image-20221130190150749.png" alt="五种常用数据类型特点速览" style="zoom:50%;" />
 - 字符串 string
 - 哈希 hash
 - 列表 list
@@ -704,7 +704,7 @@ Redis hash 是一个string类型的 field 和 value 的映射表，hash特别适
 - **HGETALL** key                              获取哈希表 key 中所有的字段和值
 - **HINCRBY** key field increment       为哈希表 key 中字段 field 的值加上增量 increment
 
-<img src="./redis.assets/image-20221130193121969.png" alt="image-20221130193121969" style="zoom: 67%;" /> 
+<img src="./Redis.assets/image-20221130193121969.png" alt="image-20221130193121969" style="zoom: 67%;" /> 
 
 **命令示例：**
 
@@ -759,7 +759,7 @@ Redis 列表是简单的字符串列表，按照插入顺序排序，常用命�
 - **BLPOP** key [key ...] timeout      移出并获取列表的第一个元素，列表为空时阻塞等待 timeout 秒（timeout=0 一直阻塞）
 - **BRPOP** key [key ...] timeout      移出并获取列表的最后一个元素，列表为空时阻塞等待 timeout 秒
 
-<img src="./redis.assets/image-20221130193332666.png" alt="image-20221130193332666" style="zoom: 67%;" /> 
+<img src="./Redis.assets/image-20221130193332666.png" alt="image-20221130193332666" style="zoom: 67%;" /> 
 
 **命令示例：**
 
@@ -807,7 +807,7 @@ Redis set 是string类型的无序集合。集合成员是唯一的，这就意�
 - **SUNION** key [key ...]                   返回所有给定集合的并集
 - **SDIFF** key [key ...]                      返回第一个集合与其他集合的差集
 
-<img src="./redis.assets/image-20221130193532735.png" alt="image-20221130193532735" style="zoom: 67%;" /> 
+<img src="./Redis.assets/image-20221130193532735.png" alt="image-20221130193532735" style="zoom: 67%;" /> 
 
 **命令示例：**
 
@@ -857,7 +857,7 @@ Redis有序集合是string类型元素的集合，且不允许有重复成员。
 - **ZUNIONSTORE** destkey numkeys key [key ...]   计算多个有序集合的并集并存入 destkey
 - **ZINTERSTORE** destkey numkeys key [key ...]   计算多个有序集合的交集并存入 destkey
 
-<img src="./redis.assets/image-20221130193951036.png" alt="image-20221130193951036" style="zoom: 67%;" /> 
+<img src="./Redis.assets/image-20221130193951036.png" alt="image-20221130193951036" style="zoom: 67%;" /> 
 
 **完整命令演示（字符串 → 哈希 → 列表 → 集合 → 有序集合串联演练）：**
 
@@ -993,7 +993,7 @@ zhangsan
 
 Bitmap（位图）并不是一种新的数据类型，而是基于 **String** 类型实现的一组"位"操作：字符串的每个字节会被拆成 8 个 bit（二进制位），可以用一个 bit 表示一种状态（0 或 1），因此在"状态标记"类场景下比 String/Set 等类型节省大量内存。offset 从 0 开始，一个 key 最多可以存 2^32-1 个 bit（约 512MB）。
 
-![1792160921957](redis.assets/1792160921957.png)
+![1792160921957](Redis.assets/1792160921957.png)
 
 ```
 key  →  [ 0 | 1 | 0 | 0 | 0 | ... ]
@@ -1033,7 +1033,7 @@ offset:  0   1   2   3   4
 
 **每日签到场景（对应课程案例）：**
 
-![1792160889506](redis.assets/1792160889506.png)
+![1792160889506](Redis.assets/1792160889506.png)
 
 ```shell
 > setbit dailycheck:1 100 1   # 1号用户第100天完成了签到
@@ -1103,7 +1103,7 @@ OK
 
 Geo 类型用于存储地理位置信息（经度、纬度），底层实现是 ZSet（分数为 geohash 编码），常用来实现"附近的人 / 商家 / 景点"等 LBS 场景。
 
-![1792160864260](redis.assets/1792160864260.png)
+![1792160864260](Redis.assets/1792160864260.png)
 
 - **GEOADD** key [NX|XX] [CH] longitude latitude member [longitude latitude member ...]   添加一个或多个地点（参数顺序：经度 纬度 成员名）
 - **GEOPOS** key member [member ...]          返回一个或多个地点的经纬度
@@ -1129,7 +1129,7 @@ Geo 类型用于存储地理位置信息（经度、纬度），底层实现是 
 
 Stream 是 Redis 5.0 引入的**消息队列**类型，被称为"Redis 版的 MQ"——兼具**阻塞队列 + pub/sub** 的能力，支持消息持久化、消费者组、ACK 确认。企业应用相对较少（生产环境一般直接用 Kafka、RabbitMQ 等专业 MQ）。
 
-![1792160372912](redis.assets/1792160372912.png)
+![1792160372912](Redis.assets/1792160372912.png)
 
 - **XADD** key [NOMKSTREAM] [MAXLEN|MINID [=|~] threshold [LIMIT count]] *|id field value [field value ...]    往队列末尾发布一条消息（`*` 表示让系统自动生成 ID）
 - **XDEL** key id [id ...]                            删除队列中的一条或多条消息
@@ -1228,7 +1228,7 @@ Spring Data Redis 是 Spring 的一部分，提供了在 Spring 应用中通过�
 
 网址：https://spring.io/projects/spring-data-redis
 
-<img src="./redis.assets/image-20210927143741458.png" alt="image-20210927143741458" style="zoom: 33%;" /> 
+<img src="./Redis.assets/image-20210927143741458.png" alt="image-20210927143741458" style="zoom: 33%;" /> 
 
 Spring Boot提供了对应的Starter，maven坐标：
 
@@ -1392,7 +1392,7 @@ public class SpringDataRedisTest {
 
 测试：
 
-<img src="./redis.assets/image-20221130205351403.png" alt="image-20221130205351403" style="zoom:50%;" /> 
+<img src="./Redis.assets/image-20221130205351403.png" alt="image-20221130205351403" style="zoom:50%;" /> 
 
 说明RedisTemplate对象注入成功，并且通过该RedisTemplate对象获取操作5种数据类型相关对象。
 
@@ -1655,11 +1655,11 @@ public class RedisTest {
 </dependency>
 ```
 
-<img src="./redis.assets/1772936077937.png" alt="连接测试成功" style="zoom:50%;" />
+<img src="./Redis.assets/1772936077937.png" alt="连接测试成功" style="zoom:50%;" />
 
 ## 5. Redis线程模型
 
-> 参考《深入理解 Redis 线程模型》。核心结论：整体线程模型 = **客户端多线程 + 服务端核心单线程**，依靠复合指令、事务、Pipeline、Lua 脚本、Function 等机制保证指令原子性；同时要重点关注 Bigkey 对单线程模型造成的阻塞风险。
+> 核心结论：整体线程模型 = **客户端多线程 + 服务端核心单线程**，依靠复合指令、事务、Pipeline、Lua 脚本、Function 等机制保证指令原子性；同时要重点关注 Bigkey 对单线程模型造成的阻塞风险。
 
 ### 5.1 Redis 到底是单线程还是多线程？
 
@@ -1671,12 +1671,51 @@ Redis 为了支撑大量客户端同时连接，使用**多线程维护与客户
 
 ```
 # 默认最大连接数 10000，超过后新连接会被拒绝
+# Redis is mostly single threaded, however there are certain threaded
+# operations such as UNLINK, slow I/O accesses and other things that are
+# performed on side threads.
+#
+# Now it is also possible to handle Redis clients socket reads and writes
+# in different I/O threads. Since especially writing is so slow, normally
+# Redis users use pipelining in order to speed up the Redis performances per
+# core, and spawn multiple instances in order to scale more. Using I/O
+# threads it is possible to easily speedup two times Redis without resorting
+# to pipelining nor sharding of the instance.
+#
+# By default threading is disabled, we suggest enabling it only in machines
+# that have at least 4 or more cores, leaving at least one spare core.
+# Using more than 8 threads is unlikely to help much. We also recommend using
+# threaded I/O only if you actually have performance problems, with Redis
+# instances being able to use a quite big percentage of CPU time, otherwise
+# there is no point in using this feature.
+#
+# So for instance if you have a four cores boxes, try to use 2 or 3 I/O
+# threads, if you have a 8 cores, try to use 6 threads. In order to
+# enable I/O threads use the following configuration directive:
+#
+# io-threads 4
+
+# Set the max number of connected clients at the same time. By default
+# this limit is set to 10000 clients, however if the Redis server is not
+# able to configure the process file limit to allow for the specified limit
+# the max number of allowed clients is set to the current file limit
+# minus 32 (as Redis reserves a few file descriptors for internal uses).
+#
+# Once the limit is reached Redis will close all the new connections sending
+# an error 'max number of clients reached'.
+#
+# IMPORTANT: When Redis Cluster is used, the max number of connections is also
+# shared with the cluster bus: every node in the cluster will use two
+# connections, one incoming and another outgoing. It is important to size the
+# limit accordingly in case of very large clusters.
 maxclients 10000
 ```
 
 #### 5.1.2 服务端单线程：主线程处理网络 IO 与键值读写
 
 服务端响应网络 IO 和键值对读写的请求，统一由一个**主线程**完成。Redis 基于 **epoll 实现 IO 多路复用**，让一个主线程同时响应多个客户端 Socket 连接的请求：
+
+![1792196520930](Redis.assets/1792196520930.png)
 
 - 并发请求被转成**串行执行** → 天然没有 MySQL 那种脏读、幻读、不可重复读的并发问题；
 - 串行化 + 基于内存工作的极高性能 → 让 Redis 成为很多并发问题的解决工具。

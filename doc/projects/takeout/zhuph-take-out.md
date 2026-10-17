@@ -26,11 +26,11 @@ zhuph-take-out
 
 访问地址 `http://localhost:8888/#/login`
 
-![1772114443202](./takeout.assets/1772114443202.png)
+![1772114443202](./zhuph-take-out.assets/1772114443202.png)
 
 ### 小程序（客户端）
 
-![1772114509946](./takeout.assets/1772114509946.png)
+![1772114509946](./zhuph-take-out.assets/1772114509946.png)
 
 ## 技术选型
 
