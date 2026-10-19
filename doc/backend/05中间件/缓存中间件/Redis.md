@@ -343,7 +343,7 @@ Redis的服务端口为6379(master),6380,6381。Sentinel的服务端口为26379,
 
 Sentinel最核心的配置其实就是 sentinel.conf中的
 
-sentinel monitor <master-name> <ip> <redis-port> <quorum>
+`sentinel monitor <master-name> <ip> <redis-port> <quorum>`
 
 ```
 # sentinel monitor <master-name> <ip> <redis-port> <quorum>
@@ -1890,7 +1890,7 @@ Pipeline 的思路简单明了：**将客户端多个指令打包，一起推送
 
 原始文件command.txt
 
-```command.txt
+```shell
 set count 1
 incr count
 incr count
@@ -2256,7 +2256,7 @@ RDB + AOF: You can also combine both AOF and RDB in the same instance.
 
 redis.conf
 
-```.conf
+```shell
 [root@zhuph redis] # cat redis6379.conf
 loadmodule /root/myredis/basic/redisbloom.so
 bind * -::/*
@@ -2345,7 +2345,7 @@ RDB 在指定的时间间隔，将当前时间点内存中的**全部数据集**
 | `stop-writes-on-bgsave-error` | `yes` | 快照写入失败时是否停止写入；设为 `no` 表示不在乎数据不一致，快照失败也继续接受写请求 |
 | `rdbchecksum` | `yes` | 保存快照后用 CRC64 算法校验数据（约增加 10% 性能消耗）；追求极致性能可关闭 |
 
-```conf
+```ini
 # save <seconds> <changes>，默认策略：
 # 3600 秒（1 小时）内至少 1 次写操作
 # 300 秒（5 分钟）内至少 100 次写操作
@@ -2462,7 +2462,7 @@ redis-check-aof --fix appendonly.aof.1.incr.aof
 
 RDB 和 AOF 各有优劣，Redis 支持同时开启两种持久化策略：
 
-```conf
+```ini
 # Redis 可以创建 RDB 或 AOF 格式的 base 文件；RDB 格式总是更快更高效
 # Redis can create append-only base files in either RDB or AOF formats. Using
 # the RDB format is always faster and more efficient, and disabling it is only
@@ -2486,7 +2486,7 @@ aof-use-rdb-preamble yes
 
 redis.conf中的描述
 
-```conf
+```ini
 # Master-Replica replication. Use replicaof to make a Redis instance a copy of
 # another Redis server. A few things to understand ASAP about Redis replication.
 #
@@ -2591,7 +2591,7 @@ repl_backlog_histlen:560
 
 redis.conf中配置了slave的默认权限
 
-```conf
+```ini
 # Since Redis 2.6 by default replicas are read-only.
 #
 # Note: read only replicas are not designed to be exposed to untrusted clients
@@ -2651,7 +2651,7 @@ replica-read-only yes
 
 - **危险指令屏蔽**：从库虽然禁止写数据，但**并没有禁止 CONFIG、DEBUG 等管理指令**，这些指令若与主节点不一致，仍容易造成数据不一致。安全起见可用 `rename-command` 屏蔽危险指令：
 
-```conf
+```ini
 # redis.conf 中屏蔽 CONFIG 指令（空字符串表示禁用）
 rename-command CONFIG ""
 # 很多企业维护 Redis 时，会直接 rename 禁用 KEYS、FLUSHDB、FLUSHALL 等危险指令
@@ -2785,7 +2785,7 @@ DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms
 
 还可以用两个参数强制保证每个 master 必须有健康的 slave：
 
-```conf
+```ini
 # 至少连接 N 个副本、且延迟不超过 M 秒时，master 才接受写入（默认关闭）
 min-replicas-to-write 3
 min-replicas-max-lag 10
