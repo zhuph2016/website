@@ -337,6 +337,35 @@ Redis 哨兵模式是通过在独立的哨兵节点上运行特定的哨兵进�
   └──────────┘
 ```
 
+#### Sentinel核心配置
+
+Redis的服务端口为6379(master),6380,6381。Sentinel的服务端口为26379,26380,26381
+
+Sentinel最核心的配置其实就是 sentinel.conf中的
+
+sentinel monitor <master-name> <ip> <redis-port> <quorum>
+
+```
+# sentinel monitor <master-name> <ip> <redis-port> <quorum>
+#
+# Tells Sentinel to monitor this master, and to consider it in O_DOWN
+# (Objectively Down) state only if at least <quorum> sentinels agree.
+#
+# Note that whatever is the ODOWN quorum, a Sentinel will require to
+# be elected by the majority of the known Sentinels in order to
+# start a failover, so no failover can be performed in minority.
+#
+# Replicas are auto-discovered, so you don't need to specify replicas in
+# any way. Sentinel itself will rewrite this configuration file adding
+# the replicas using additional configuration options.
+# Also note that the configuration file is rewritten when a
+# replica is promoted to master.
+#
+# Note: master name should not include special characters or spaces.
+# The valid charset is A-z 0-9 and the three characters ".-_".
+sentinel monitor mymaster 127.0.0.1 6379 2
+```
+
 #### 2.4.2 哨兵工作流程
 
 - **领导者选举**：启动时每个哨兵节点执行选举过程，其中一个哨兵节点被选为领导者（leader），负责协调其他哨兵节点。
@@ -369,6 +398,23 @@ sentinel down-after-milliseconds mymaster 30000  # 第134行，判定服务器 d
 sentinel failover-timeout mymaster 180000        # 第234行，故障节点的最大超时时间为 180000（180 秒）
 ```
 
+启动
+
+```
+[root@192-168-65-214 sentinel]# redis-sentinel ./sentinel26379.conf
+[root@192-168-65-214 sentinel]# redis-sentinel ./sentinel26380.conf
+[root@192-168-65-214 sentinel]# redis-sentinel ./sentinel26381.conf
+
+[root@192-168-65-214 sentinel]# ps -ef|grep redis
+root      4849     1  0 21:14 ?        00:00:02 redis-server *:6380
+root      4859     1  0 21:14 ?        00:00:02 redis-server *:6381
+root      5166     1  0 21:32 ?        00:00:00 redis-server *:6379
+root      5239     1  0 21:38 ?        00:00:00 redis-sentinel *:26379 [sentinel]
+root      5259     1  0 21:38 ?        00:00:00 redis-sentinel *:26380 [sentinel]
+root      5265     1  0 21:38 ?        00:00:00 redis-sentinel *:26381 [sentinel]
+root      5271 31762  0 21:38 pts/0    00:00:00 grep --color=auto redis
+```
+
 启动后检查哨兵状态：
 
 ```shell
@@ -382,6 +428,7 @@ redis-cli -p 26379 info sentinel
 # 故障模拟：可以杀掉主节点的进程，也可以直接停掉主节点服务
 ps aux | grep redis
 redis-cli shutdown
+redis-cli -a zhuph -p 6379 shutdown
 
 # 观察哨兵日志，129 主节点下线，重新选举 131 为主节点
 tail -f sentinel.log
@@ -602,11 +649,11 @@ redis-cli -p 6380 shutdown
 | 哨兵 | `sentinel.conf` | `/opt/software/redis/redis-stable` |
 | 集群 | `cluster/redis_6379.conf`、`cluster/redis_6380.conf` | `/opt/software/redis/redis-stable/cluster` |
 
-## 3. Redis 数据类型与常用命令
+## 3. Redis 数据类型
 
 > 完整命令列表参考官方文档：https://redis.io/docs/latest/commands/
 
-### 3.1 数据类型总览
+### 3.1 总览
 
 Redis 存储的是 key-value 结构的数据，其中 key 是字符串类型，value 分为 5 种常用数据类型和 4 种扩展数据类型。
 
@@ -1667,7 +1714,9 @@ public class RedisTest {
 
 #### 5.1.1 客户端多线程：维护 Socket 连接
 
-Redis 为了支撑大量客户端同时连接，使用**多线程维护与客户端的 Socket 连接**，`redis.conf` 中的 `maxclients` 控制最大连接数：
+Redis 为了支撑大量客户端同时连接，使用**多线程维护与客户端的 Socket 连接**，`redis.conf` 中 
+
+`maxclients` 控制最大连接数：
 
 ```
 # 默认最大连接数 10000，超过后新连接会被拒绝
@@ -1744,7 +1793,11 @@ io-threads 4
 
 ### 5.2 Redis 如何保证指令原子性
 
-核心读写操作是单线程串行处理的，多个客户端同时读写只会排队串行。但**单条指令的原子性 ≠ 一个客户端多步操作的原子性**——针对单个客户端，Redis 并没有像 MySQL 事务那样保证同一客户端的操作整体原子性，多步操作之间仍可能被其他客户端的指令"加塞"。针对不同业务场景，Redis 提供了多种控制指令原子性的思路。
+核心读写操作是单线程串行处理的，多个客户端同时读写只会排队串行。但**单条指令的原子性 ≠ 一个客户端多步操作的原子性**——针对单个客户端，Redis 并没有像 MySQL 事务那样保证同一客户端的操作整体原子性，多步操作之间仍可能被其他客户端的指令"加塞"。
+
+![1792232634255](Redis.assets/1792232634255.png)
+
+针对不同业务场景，Redis 提供了多种控制指令原子性的思路。
 
 #### 5.2.1 复合指令
 
@@ -1761,6 +1814,8 @@ OK
 ```
 
 #### 5.2.2 Redis 事务（MULTI / EXEC）
+
+不会被插队
 
 | 命令 | 作用 |
 | --- | --- |
@@ -1788,6 +1843,8 @@ QUEUED
 > 开启事务后，所有操作返回 `QUEUED`，表示只是排好了队，等到 `EXEC` 后一起执行。
 
 **Redis 事务 ≠ 数据库事务**：它**不保证事务中的指令一起成功或一起失败**，只保证事务中的原子操作**一起执行，不会被其他指令加塞**。
+
+对于Redis事务的更多说明，参见官网 <https://redis.io/docs/latest/develop/interact/transactions/>
 
 ```bash
 # lpop 是针对 list 的操作，现在对 string 类型的 k2 操作，必然报错
@@ -1819,7 +1876,28 @@ QUEUED
 
 #### 5.2.3 Pipeline 管道
 
-**核心作用：优化 RTT（Round-Trip Time）**。RTT 指指令数据包从 Client → Server → Client 的往返时间，指令越频繁 RTT 消耗越可观。Pipeline 的思路简单明了：**将客户端多个指令打包，一起推送给服务端**，一次往返完成多笔操作。
+**使用场景**
+
+如果你有大批量的数据需要快速写入到Redis中，这种方式可以一定程度提高执行效率
+
+具体参考官网：<https://redis.io/docs/latest/develop/use/pipelining/>
+
+**核心作用：优化 RTT（Round-Trip Time）**。RTT 指指令数据包从 Client → Server → Client 的往返时间，指令越频繁 RTT 消耗越可观。
+
+Pipeline 的思路简单明了：**将客户端多个指令打包，一起推送给服务端**，一次往返完成多笔操作。
+
+![1792234744979](Redis.assets/1792234744979.png)
+
+原始文件command.txt
+
+```command.txt
+set count 1
+incr count
+incr count
+incr count
+```
+
+指令执行
 
 ```bash
 # command.txt 中包含多条指令，一次管道批量执行
@@ -1832,15 +1910,54 @@ errors: 0, replies: 4
 **注意点：**
 
 1. **Pipeline 不具备原子性**：只是将多条命令发送到服务端，最终仍可能被其他客户端的指令加塞（虽然概率较小），所以不建议在 Pipeline 中做复杂的数据操作；
+
 2. 执行复合指令和事务会**阻塞其他命令执行**，而执行 Pipeline 不会；
+
 3. Pipeline 执行过程中会**阻塞当前客户端**，不建议拼装过多指令——指令过多会使客户端阻塞太久，且服务端需要回复繁忙客户端、占用大量内存；
+
 4. 适合在**非热点时段**做大批量数据调整任务（如批量写入）。
+
+
+**使用案例**
+
+nc 建立tcp连接 redis-cli 
+
+```shell
+[root@192-168-65-214 ~]# printf "AUTH 123qweasd\r\nPING\r\nPING\r\nPING\r\n" | nc localhost 6379
++OK
++PONG
++PONG
++PONG
+```
 
 #### 5.2.4 Lua 脚本（最常用）
 
 Redis 事务和 Pipeline 对原子性问题都有"水土不服"的地方，且都只是对现有指令进行拼凑，无法承载自定义复杂逻辑。因此企业中用到更多的是 **Lua 脚本**，也是 Redis 7 版本着重调整的功能。
 
-Lua 是一种小巧的脚本语言，最大特点是**单线程模型**，天然适合 Redis、Nginx 这类单线程中间件做功能定制——**在 Redis 中执行一段 Lua 脚本，天然就是原子性的**（Redis 7.x 支持 Lua 5.1）。
+[The Programming Language Lua](https://www.lua.org/)
+
+> 如果你对lua原生的语法感兴趣，推荐一个参考网站：<https://wiki.luatos.com/> 这个网站可以直接在线调试lua语法，简单轻松无压力。
+
+![1792235839400](Redis.assets/1792235839400.png)
+
+Lua 是一种小巧的脚本语言，拥有很多高级语言的特性。比如参数类型、作用域、函数等。最大特点是**单线程模型**，天然适合 Redis、Nginx 这类单线程中间件做功能定制——**在 Redis 中执行一段 Lua 脚本，天然就是原子性的**（Redis 7.x 支持 Lua 5.1）。
+
+**Redis中如何执行lua？**
+
+Redis中对lua语言的API介绍参考官网： <https://redis.io/docs/latest/develop/interact/programmability/lua-api/>
+
+Redis中对lua支持从2.6.0版本就已经开始了。具体参考指令可以使用 help eval指令查看
+
+>   127.0.0.1:6379> help eval
+>
+>   EVAL script numkeys [key [key ...]] [arg [arg ...]]
+>   summary: Executes a server-side Lua script.
+>   since: 2.6.0
+>   group: scripting  
+
+- script参数是一段Lua脚本程序，它会被运行在Redis服务器上下文中，这段脚本不必(也不应该)定义为一 个Lua函数。
+- numkeys参数用于指定键名参数的个数。键名参数 key [key ...] 从EVAL的第三个参数开始算 起，表示在脚本中所用到的那些Redis键(key)，这些键名参数可以在 Lua中通过全局变量KEYS数组，用1 为基址的形式访问( KEYS[1] ， KEYS[2] ，以此类推)。
+- 在命令的最后，那些不是键名参数的附加参数 arg [arg ...] ，可以在Lua中通过全局变量ARGV数组访问， 访问的形式和KEYS变量类似( ARGV[1] 、 ARGV[2] ，诸如此类)。
 
 **执行方式：**
 
@@ -1863,11 +1980,25 @@ OK
 "10"
 ```
 
+格式化脚本
+
+```lua
+local initcount = redis.call('get', KEYS[1])
+local a = tonumber(initcount) -- 读取stock_1的值转数字
+local b = tonumber(ARGV[1])   -- b=10
+if a >= b then
+    redis.call('set', KEYS[1], a) -- 原值不变
+    return 1
+end
+redis.call('set', KEYS[1], b)     -- 把key设置成b
+return 0
+```
+
 **使用注意点：**
 
 1. **不要在脚本中出现死循环和耗时运算**，否则 Redis 会阻塞、不再接受其他命令（这一点与 Pipeline 不同，Pipeline 不会阻塞服务端）。Redis 有配置参数控制 Lua 脚本最长执行时间，**默认 5 秒**；超时后 Redis 对其他操作返回 `BUSY` 错误，此时只允许执行 `SCRIPT KILL`、`FUNCTION KILL`、`SHUTDOWN NOSAVE` 等少量命令：
 
-```
+```shell
 # redis.conf：控制 EVAL 脚本、Function 的最大执行时间（默认 5000ms）
 lua-time-limit 5000
 # busy-reply-threshold 5000   # 旧名称，现在是别名
@@ -1928,6 +2059,8 @@ redis.register_function('my_hset', my_hset)
 6) "another value"
 ```
 
+help @scripting
+
 **Function 注意点：**
 
 1. Function 同样可以进行只读调用；
@@ -1949,24 +2082,738 @@ redis.register_function('my_hset', my_hset)
 
 ### 5.3 Redis 中的 Bigkey 问题
 
+redis-cli --help
+
 **Bigkey** 指占用空间非常大的 key，例如一个 list 包含 200W 个元素，或一个 string 里放一篇文章。基于 Redis **单线程为主**的核心机制，操作这些 Bigkey 非常容易造成**服务阻塞**，实际项目中一定要特殊关照。
 
 Redis 客户端提供了两个扩展参数，帮助快速发现 Bigkey：
 
+复杂度高
+
 ```bash
 # 找出元素很多（复杂度高）的 key
 redis-cli --bigkeys
+(base) PS C:\Users\Zhuph> redis-cli --bigkeys
+
+# Scanning the entire keyspace to find biggest keys as well as
+# average sizes per key type.  You can use -i 0.1 to sleep 0.1 sec
+# per 100 SCAN commands (not usually needed).
+
+100.00% ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Keys sampled: 103
+
+-------- summary -------
+
+Total key length in bytes is 2890 (avg len 28.06)
+
+Biggest   hash found "redis:hash:1" has 11 fields
+Biggest stream found "s1" has 3 entries
+Biggest string found "nfturbo:inviteCode" has 115250 bytes
+Biggest    set found "redis:set:all" has 4 members
+Biggest   zset found "changsha" has 4 members
+
+0 lists with 0 items (00.00% of keys, avg size 0.00)
+19 hashs with 66 fields (18.45% of keys, avg size 3.47)
+2 streams with 5 entries (01.94% of keys, avg size 2.50)
+75 strings with 232074 bytes (72.82% of keys, avg size 3094.32)
+1 sets with 4 members (00.97% of keys, avg size 4.00)
+6 zsets with 12 members (05.83% of keys, avg size 2.00)
+```
+
+内存很大
+
+```shell
 # 找出占用内存很大的 key
 redis-cli --memkeys
+(base) PS C:\Users\Zhuph> redis-cli --memkeys
+
+# Scanning the entire keyspace to find biggest keys as well as
+# average sizes per key type.  You can use -i 0.1 to sleep 0.1 sec
+# per 100 SCAN commands (not usually needed).
+
+100.00% ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Keys sampled: 103
+
+-------- summary -------
+
+Total key length in bytes is 2890 (avg len 28.06)
+
+Biggest   hash found "ai:chat:zhuph" has 6941 bytes
+Biggest stream found "mystream" has 1373 bytes
+Biggest string found "nfturbo:inviteCode" has 115297 bytes
+Biggest    set found "redis:set:all" has 1607 bytes
+Biggest   zset found "{nfturbo:limit:limit#COLLECTIONf64e5fbe-2626-4f2b-9628-c28a9b5483c3}:permits" has 137 bytes
+
+0 lists with 0 bytes (00.00% of keys, avg size 0.00)
+19 hashs with 12967 bytes (18.45% of keys, avg size 682.47)
+2 streams with 1673 bytes (01.94% of keys, avg size 836.50)
+75 strings with 235579 bytes (72.82% of keys, avg size 3141.05)
+1 sets with 1607 bytes (00.97% of keys, avg size 1607.00)
+6 zsets with 690 bytes (05.83% of keys, avg size 115.00)
 ```
 
 ### 5.4 线程模型总结
 
 1. Redis 整体还是**多线程**的，只是后台执行指令的**核心线程是单线程**，整个线程模型以单线程为主，不同客户端的各种指令依次排队执行；
+
 2. 这种以单线程为主的模型相比其他中间件非常简单，让 Redis 处理线程并发问题简单高效，甚至在很多复杂业务场景下成为**并发控制工具**；但这不意味着没有并发问题——**选择合理的指令执行方式**非常重要；
+
 3. 简单的线程模型本身**不利于发挥多线程的并发优势**，而 Redis 的应用场景又通常与高性能深度绑定，所以使用时要时刻思考指令执行方式（复合指令、事务、Pipeline、Lua、Function），才能最大限度发挥 Redis 高性能的优势。
 
-## 6. Redisson
+   多核计算机
+
+## 6. Redis数据安全性
+
+> 核心结论：Redis 的数据安全 = **单机持久化**（RDB/AOF/混合）＋**分布式冗余**（主从复制）＋**高可用**（哨兵/集群），层层递进。持久化只保证单机数据安全，若服务器磁盘损坏，再好的持久化策略也无济于事；因此分布式部署架构才是 Redis 数据安全的最终保障。
+
+### 6.1 性能压测：在数据安全与读写性能之间找平衡
+
+```
+redis-server ./redis.conf
+```
+
+Redis 所有数据保存在内存中，得益于内存高效的读写性能，Redis 性能非常强悍。但内存的缺点是**断电即丢失**，所以在实际项目中，一旦需要保存重要数据，就不可能完全依赖内存。真实项目使用 Redis，一定要针对应用场景进行性能估算，在**数据安全性与读写性能之间找到平衡点**。
+
+Redis 提供了压测脚本 `redis-benchmark`，可以对 Redis 进行快速基准测试：
+
+```shell
+# 20 个线程、100W 个请求，测试 set 指令（写数据）
+[root@zhuph redis-stable]# redis-benchmark -a zhuph -t set -n 1000000 -c 20
+====== SET ======
+  1000000 requests completed in 6.65 seconds
+  20 parallel clients
+  3 bytes payload
+  keep alive: 1
+  host configuration "save": 3600 1 300 100 60 10000
+  host configuration "appendonly": no
+  multi-thread: no
+
+Latency by percentile distribution:
+0.000% <= 0.031 milliseconds (cumulative count 1)
+50.000% <= 0.071 milliseconds (cumulative count 708718)
+75.000% <= 0.079 milliseconds (cumulative count 811032)
+87.500% <= 0.103 milliseconds (cumulative count 885719)
+93.750% <= 0.135 milliseconds (cumulative count 938906)
+96.875% <= 0.183 milliseconds (cumulative count 970812)
+98.438% <= 0.215 milliseconds (cumulative count 985902)
+99.219% <= 0.247 milliseconds (cumulative count 992252)
+99.609% <= 0.295 milliseconds (cumulative count 996563)
+99.805% <= 0.327 milliseconds (cumulative count 998092)
+99.902% <= 0.383 milliseconds (cumulative count 999097)
+99.951% <= 0.471 milliseconds (cumulative count 999548)
+99.976% <= 0.583 milliseconds (cumulative count 999757)
+99.988% <= 0.783 milliseconds (cumulative count 999881)
+99.994% <= 0.951 milliseconds (cumulative count 999939)
+99.997% <= 1.247 milliseconds (cumulative count 999972)
+99.998% <= 1.303 milliseconds (cumulative count 999986)
+99.999% <= 1.519 milliseconds (cumulative count 999994)
+100.000% <= 1.543 milliseconds (cumulative count 999997)
+100.000% <= 1.551 milliseconds (cumulative count 999999)
+100.000% <= 1.559 milliseconds (cumulative count 1000000)
+100.000% <= 1.559 milliseconds (cumulative count 1000000)
+
+Cumulative distribution of latencies:
+88.572% <= 0.103 milliseconds (cumulative count 885719)
+98.341% <= 0.207 milliseconds (cumulative count 983408)
+99.699% <= 0.303 milliseconds (cumulative count 996986)
+99.929% <= 0.407 milliseconds (cumulative count 999290)
+99.962% <= 0.503 milliseconds (cumulative count 999620)
+99.978% <= 0.607 milliseconds (cumulative count 999779)
+99.985% <= 0.703 milliseconds (cumulative count 999851)
+99.989% <= 0.807 milliseconds (cumulative count 999893)
+99.993% <= 0.903 milliseconds (cumulative count 999931)
+99.995% <= 1.007 milliseconds (cumulative count 999945)
+99.995% <= 1.103 milliseconds (cumulative count 999949)
+99.996% <= 1.207 milliseconds (cumulative count 999958)
+99.999% <= 1.303 milliseconds (cumulative count 999986)
+99.999% <= 1.407 milliseconds (cumulative count 999989)
+99.999% <= 1.503 milliseconds (cumulative count 999990)
+100.000% <= 1.607 milliseconds (cumulative count 1000000)
+
+Summary:
+  throughput summary: 150398.55 requests per second ##平均每秒15W次写操作。
+  latency summary (msec):
+          avg       min       p50       p95       p99       max
+        0.078     0.024     0.071     0.151     0.239     1.559
+```
+
+> 更多参数使用 `redis-benchmark --help` 查看；调整部署架构（主从/哨兵/集群）后，建议多进行几次对比测试。
+
+### 6.2 数据持久化机制（单机数据安全）
+
+> 官网介绍：https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/
+
+```
+Persistence refers to the writing of data to durable storage, such as a solid-state disk (SSD). Redis provides a range of persistence options. These include:
+
+RDB (Redis Database): RDB persistence performs point-in-time snapshots of your dataset at specified intervals.
+AOF (Append Only File): AOF persistence logs every write operation received by the server. These operations can then be replayed again at server startup, reconstructing the original dataset. Commands are logged using the same format as the Redis protocol itself.
+No persistence: You can disable persistence completely. This is sometimes used when caching.
+RDB + AOF: You can also combine both AOF and RDB in the same instance.
+```
+
+#### 6.2.1 配置文件
+
+redis.conf
+
+```.conf
+[root@zhuph redis] # cat redis6379.conf
+loadmodule /root/myredis/basic/redisbloom.so
+bind * -::/*
+protected-mode no
+port 6379
+daemonize yes
+requirepass 123qweasd
+pidfile /var/run/redis_6379.pid
+logfile "/root/myredis/basic/logs/6379.log"
+save 3600 1 300 100 60 10000
+dbfilename dump.rdb
+dir /root/myredis/basic/db
+appendonly yes
+appendfilename "appendonly.aof"
+appenddirname "appendonlydir"
+# 默认 everysec
+# appendfsync always
+appendfsync everysec
+# appendfsync no
+# 默认值
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
+enable-debug-command local
+```
+
+#### 6.2.2 持久化策略总览
+
+Redis 提供了很多与数据持久化相关的配置，大体上可以组成以下几种策略：
+
+| 策略 | 说明 | 数据安全程度 |
+| --- | --- | --- |
+| 无持久化 | 完全关闭数据持久化 | 不保证（相当于纯缓存） |
+| RDB(RedisDatabase） | 按一定时间间隔保存全量数据快照 | 非实时，总有数据丢失可能 |
+| AOF(Append Only File) | 记录每一次写操作，通过操作重演恢复 | 更安全（默认每秒最多丢 1 秒） |
+| RDB + AOF | 同时保存数据快照和操作日志 | 最完整（恢复更快） |
+
+**整体使用建议：**
+
+1. 只是把 Redis 当缓存用 → 直接关闭持久化；
+2. 关注数据安全、可接受宕机时小部分数据损失 → 使用 RDB，性能较高；
+3. **不建议单独使用 AOF**，RDB 配合 AOF 可以让数据恢复更快。
+
+#### 6.2.3 RDB 快照持久化
+
+**1）能干什么**
+
+RDB 在指定的时间间隔，将当前时间点内存中的**全部数据集**备份到磁盘文件（默认 `dump.rdb`），恢复时再把快照文件直接读回内存。由于存的是全量数据，甚至可以直接用 RDB 传递数据——例如把最近的 RDB 文件复制到另一个 Redis 服务（最好是同版本），即可完成数据迁移。
+
+**2）重要配置**
+
+```
+################################ SNAPSHOTTING  ################################
+
+# Save the DB to disk.
+#
+# save <seconds> <changes> [<seconds> <changes> ...]
+#
+# Redis will save the DB if the given number of seconds elapsed and it
+# surpassed the given number of write operations against the DB.
+#
+# Snapshotting can be completely disabled with a single empty string argument
+# as in following example:
+#
+# save ""
+#
+# Unless specified otherwise, by default Redis will save the DB:
+#   * After 3600 seconds (an hour) if at least 1 change was performed
+#   * After 300 seconds (5 minutes) if at least 100 changes were performed
+#   * After 60 seconds if at least 10000 changes were performed
+#
+# You can set these explicitly by uncommenting the following line.
+#
+# save 3600 1 300 100 60 10000
+
+```
+
+
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `save <seconds> <changes>` | `3600 1 300 100 60 10000` | 核心配置：N 秒内发生 M 次写操作即触发快照；`save ""` 可完全禁用 |
+| `dir` | `./` | 快照文件保存目录 |
+| `dbfilename` | `dump.rdb` | 快照文件名 |
+| `rdbcompression` | `yes` | 是否启用 RDB 压缩；不想消耗 CPU 可设为 `no` |
+| `stop-writes-on-bgsave-error` | `yes` | 快照写入失败时是否停止写入；设为 `no` 表示不在乎数据不一致，快照失败也继续接受写请求 |
+| `rdbchecksum` | `yes` | 保存快照后用 CRC64 算法校验数据（约增加 10% 性能消耗）；追求极致性能可关闭 |
+
+```conf
+# save <seconds> <changes>，默认策略：
+# 3600 秒（1 小时）内至少 1 次写操作
+# 300 秒（5 分钟）内至少 100 次写操作
+# 60 秒内至少 10000 次写操作
+save 3600 1 300 100 60 10000
+```
+
+**3）触发时机**
+
+1. 到达配置文件中默认的快照条件 → 自动触发；
+
+2. 手动执行 `save` 或 `bgsave`：
+
+   `save` 会**阻塞主线程**直到备份完成；
+
+   `bgsave` 不阻塞主线程，但会 fork 子进程复制一份内存数据，**占用更多内存和 CPU**；
+
+   ```
+   [root@zhuph redis-stable]# redis-cli -a zhuph
+   Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+   127.0.0.1:6379> save
+   OK
+   127.0.0.1:6379> bgsave
+   Background saving started
+   [root@zhuph redis]# last save
+   wtmp begins Sun Jul  7 16:46:02 2019
+   ```
+
+3. 主从复制建立时 → 触发 RDB 备份（见 6.3 节）。
+
+用 `LASTSAVE` 指令可查看最后一次成功执行快照的时间（毫秒级 LONG 数字，Linux 中可用 `date -d @{timestamp}` 快速格式化）。
+
+**4）优缺点**
+
+| 优点 | 缺点 |
+| --- | --- |
+| RDB 文件非常紧凑，适合定期备份数据 | 不能实时备份，总有数据丢失的可能 |
+| 快照非常适合灾难恢复 | fork 子进程需要克隆内存数据，数据量太大或 CPU 性能差时，会造成 Redis 短暂停用 |
+| 备份对主线程性能几乎没有影响（子进程完成） | |
+| 大数据量重启时比 AOF 快很多 | |
+
+#### 6.2.4 AOF 追加持久化
+
+binlog
+
+**1）能干什么**
+
+以日志形式记录**每个写操作**（读操作不记录），只允许追加、不允许改写文件；恢复时通过重演操作日志还原数据。
+
+**2）重要配置**
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `appendonly` | `no` | 是否开启 AOF |
+| `appendfilename` | `appendonly.aof` | AOF 文件名称 |
+| `appendfsync` | `everysec` | 同步策略（见下表） |
+| `appenddirname` | `appendonlydir` | AOF 目录（实际目录为 `{dir}+{appenddirname}`） |
+| `auto-aof-rewrite-percentage` | `100` | 重写触发百分比 |
+| `auto-aof-rewrite-min-size` | `64mb` | 重写触发最小体积 |
+| `no-appendfsync-on-rewrite` | `no` | AOF 重写期间是否同步刷盘 |
+
+**appendfsync 三种策略：**
+
+| 策略 | 说明 | 安全性 / 性能 |
+| --- | --- | --- |
+| `always` | 每次写操作都刷盘 | 最安全，性能最低 |
+| `everysec` | 每秒刷盘一次（默认） | 平衡，崩溃最多丢 1 秒数据 |
+| `no` | 不主动刷盘，交由操作系统决定 | 性能最高，安全性最低 |
+
+**Redis 7 的多文件结构：**
+
+Redis 7 将原来单个 AOF 文件拆分为三类文件：`base.rdb`（二进制数据快照）＋`incr.aof`（增量操作日志）＋`manifest`（记录文件信息的元文件）：
+
+![aof_multi_files](Redis.assets/aof_multi_files.png)
+
+- 现在的 AOF 已经具备了 **RDB + AOF** 的功能（base 文件即 RDB 快照）；
+- 拆分增量文件的方式，可以进一步控制单个 AOF 文件的大小；
+- Redis 会定期对 AOF 操作进行**优化重写**（例如把多个 `INCR` 合并成一个 `SET`），也可用 `BGREWRITEAOF` 手动触发；重写后生成新的 base.rdb 和 incr.aof 文件。
+
+**3）AOF 文件内容解析**
+
+打开 `appendonly.aof.1.incr.aof` 增量文件，里面按照 Redis 协议记录了每一次操作：
+
+![aof_file_content](Redis.assets/aof_file_content.png)
+
+这就是 Redis 的指令协议：以 `set k1 v1` 为例，`*3` 表示该指令由 3 个部分组成，`$3 set` 表示第一个部分是 3 个字符长度的 `set`……Redis 就是通过 TCP 协议一次次解析这些指令。了解这个协议后，甚至可以直接手写一个简单的 Redis 客户端。
+
+**4）AOF 日志恢复**
+
+如果服务异常导致 AOF 日志记录不完整（例如手动往日志文件末尾追加文字模拟），重启会失败并报错：
+
+```log
+21773:M 11 Jun 2024 18:22:43.928 # Bad file format reading the append only file appendonly.aof.1.incr.aof: make a backup of your AOF file, then use ./redis-check-aof --fix <filename.manifest>
+```
+
+使用 `redis-check-aof --fix` 修复（本质上是把最后一条不完整的指令删除）：
+
+```shell
+redis-check-aof --fix appendonly.aof.1.incr.aof
+```
+
+> RDB 文件同样提供修复指令 `redis-check-rdb`，但 RDB 是二进制压缩文件、一般不太可能被篡改，所以用得不多。**应用层误操作（如误执行 FLUSHALL）也可以用 AOF 恢复**：删除日志中最后一条 FLUSHALL 指令，重启即可恢复全部数据。
+
+**5）优缺点**
+
+| 优点 | 缺点 |
+| --- | --- |
+| 更安全：默认每秒一次写入，崩溃最多损失 1 秒操作 | 同样数据集下，AOF 文件通常比 RDB 更大 |
+| 追加式记录，不会出现记录不完整；损坏可用 redis-check-aof 轻松修复 | 写操作频繁时，备份性能通常比 RDB 慢 |
+| AOF 文件太大时自动切换新日志文件，防止单文件过大 | |
+| 记录方式简单易懂，可手动编辑日志（如删除误操作的 FLUSHALL 指令） | |
+
+#### 6.2.5 混合持久化（RDB + AOF）
+
+RDB 和 AOF 各有优劣，Redis 支持同时开启两种持久化策略：
+
+```conf
+# Redis 可以创建 RDB 或 AOF 格式的 base 文件；RDB 格式总是更快更高效
+# Redis can create append-only base files in either RDB or AOF formats. Using
+# the RDB format is always faster and more efficient, and disabling it is only
+# supported for backward compatibility purposes.
+aof-use-rdb-preamble yes
+```
+
+**恢复顺序：** 同时开启时，Redis 恢复数据**优先从 AOF 文件恢复**——因为 AOF 的数据集通常比 RDB 更完整，且 AOF 已包含 RDB 格式的 base 文件，恢复效率也比较高。
+
+**注意：** 既然重启只找 AOF，是否就不需要 RDB 备份了？**仍然建议保留 RDB 定期备份**——AOF 数据不断变化，不太利于定期备份；保留 RDB 文件，作为保证数据安全的"后手"。
+
+> 持久化只能保证**单机**数据安全：如果服务器磁盘坏了，再好的持久化策略也无济于事。要进一步保证数据安全，就需要下面三种集群化方案。
+
+### 6.3 主从复制：数据冗余与容灾（数据安全①）
+
+> 部署细节见 2.3 节。主从复制、哨兵、集群三种分布式方案，都是在分布式场景下保护数据安全与分摊流量的方案，**层层递进**。
+
+#### **6.3.1 Replica是什么？有什么用？**
+
+官网介绍：<https://redis.io/docs/latest/operate/oss_and_stack/management/replication/>
+
+redis.conf中的描述
+
+```conf
+# Master-Replica replication. Use replicaof to make a Redis instance a copy of
+# another Redis server. A few things to understand ASAP about Redis replication.
+#
+#   +------------------+      +---------------+
+#   |      Master      | ---> |    Replica    |
+#   | (receive writes) |      |  (exact copy) |
+#   +------------------+      +---------------+
+#
+# 1) Redis replication is asynchronous, but you can configure a master to
+#    stop accepting writes if it appears to be not connected with at least
+#    a given number of replicas.
+# 2) Redis replicas are able to perform a partial resynchronization with the
+#    master if the replication link is lost for a relatively small amount of
+#    time. You may want to configure the replication backlog size (see the next
+#    sections of this file) with a sensible value depending on your needs.
+# 3) Replication is automatic and does not need user intervention. After a
+#    network partition replicas automatically try to reconnect to masters
+#    and resynchronize with them.	
+```
+
+简单总结：主从复制。当Master数据有变化时，自动将新的数据异步同步到其他slave中。
+
+最典型的作用：
+
+- 读写分离：mater以写为主，Slave以读为主
+- 数据备份+容灾恢复
+
+#### **6.3.2 如何配置Replica？**
+
+一个原则：**配从不配主**。 这意味着对于一个Redis服务，可以在几乎没有影响的情况下，给他配置一个或者多个从节点。
+
+相关核心操作简化为以下几点：
+
+- REPLICAOF host port|NO ONE : 一般配置到redis.conf中。
+- SLAVEOF host port|NO ONE： 在运行期间修改slave节点的信息。如果该服务已经是某个主库的从库了，那么就会停止和原master的同步关系。
+
+#### **6.3.3 如何确定主从状态？从库可以写数据吗？**
+
+主从状态可以通过 info replication查看。
+
+例如，在一个主从复制的master节点上查看到的主从状态是这样的：
+
+- master
+
+```shell
+127.0.0.1:6379> info replication
+# Replication
+role:master
+connected_slaves:1
+slave0:ip=192.168.65.214,port=6380,state=online,offset=56,lag=1
+master_failover_state:no-failover
+master_replid:56a1835bdb1f02d2398fac3c34a321e665b07d36
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:56
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:1
+repl_backlog_histlen:56
+```
+
+> 重点要观察slave的state状态。 另外，可以观察下master_repl_offset参数。如果是刚建立Replica，数据同步是需要过程的，这时可以看到offset往后推移的过程。
+
+- slave
+
+从节点上查看到的主从状态是这样的：
+
+```shell
+127.0.0.1:6380> info replication
+# Replication
+role:slave
+master_host:192.168.65.214
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:6
+master_sync_in_progress:0
+slave_read_repl_offset:574
+slave_repl_offset:574
+slave_priority:100
+slave_read_only:1
+replica_announced:1
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:56a1835bdb1f02d2398fac3c34a321e665b07d36
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:574
+second_repl_offset:-1
+repl_backlog_active:1
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:15
+repl_backlog_histlen:560
+```
+
+> 重点要观察master_link_status
+
+默认情况下，从库是只读的，不允许写入数据。因为数据只能从master往slave同步，如果slave修改数据，就会造成数据不一致。
+
+```shell
+127.0.0.1:6380> set k4 v4
+(error) READONLY You can't write against a read only replica.
+```
+
+redis.conf中配置了slave的默认权限
+
+```conf
+# Since Redis 2.6 by default replicas are read-only.
+#
+# Note: read only replicas are not designed to be exposed to untrusted clients
+# on the internet. It's just a protection layer against misuse of the instance.
+# Still a read only replica exports by default all the administrative commands
+# such as CONFIG, DEBUG, and so forth. To a limited extent you can improve
+# security of read only replicas using 'rename-command' to shadow all the
+# administrative / dangerous commands.
+replica-read-only yes
+```
+
+这里也提到，对于slave从节点，虽然禁止了对数据的写操作，但是并没有禁止CONFIG、DEBUG等管理指令，这些指令如果和主节点不一致，还是容易造成数据不一致。如果为了安全起见，可以使用rename-command方法屏蔽这些危险的指令。
+
+例如在redis.conf配置文件中增加配置 rename-command CONFIG "" 。就可以屏蔽掉slave上的CONFIG指令。
+
+```
+# It is possible to change the name of dangerous commands in a shared
+# environment. For instance the CONFIG command may be renamed into something
+# hard to guess so that it will still be available for internal-use tools
+# but not available for general clients.
+#
+# Example:
+#
+# rename-command CONFIG b840fc02d524045429941cc15f59e41cb7be6c52
+#
+# It is also possible to completely kill a command by renaming it into
+# an empty string:
+#
+# rename-command CONFIG ""
+#
+# Please note that changing the name of commands that are logged into the
+# AOF file or transmitted to replicas may cause problems.
+```
+
+> 很多企业在维护Redis时，都会通过rename 直接禁用keys , flushdb, flushall等这一类危险的指令。
+
+#### 6.3.4 如果Slave上已经有数据了，同步时会如何处理？
+
+在从节点的日志当中其实能够分析出结果：
+
+![1792326835718](Redis.assets/1792326835718.png)
+
+也可以在从节点尝试解除主从关系，再重新建立主从关系测试一下。 
+
+![1792326856499](Redis.assets/1792326856499.png)
+
+从数据安全角度重新理解主从复制：
+
+- **数据冗余（热备份）**：master 数据实时异步同步到 slave，是持久化之外的第二种数据冗余方式；
+- **容灾恢复**：master 故障时可由 slave 提供读服务，实现快速故障恢复；
+- **从库只读**：默认 `replica-read-only yes`，从库禁止写操作，避免数据不一致：
+
+```shell
+127.0.0.1:6380> set k4 v4
+(error) READONLY You can't write against a read only replica.
+```
+
+- **危险指令屏蔽**：从库虽然禁止写数据，但**并没有禁止 CONFIG、DEBUG 等管理指令**，这些指令若与主节点不一致，仍容易造成数据不一致。安全起见可用 `rename-command` 屏蔽危险指令：
+
+```conf
+# redis.conf 中屏蔽 CONFIG 指令（空字符串表示禁用）
+rename-command CONFIG ""
+# 很多企业维护 Redis 时，会直接 rename 禁用 KEYS、FLUSHDB、FLUSHALL 等危险指令
+```
+
+**主从同步流程：**
+
+1. slave 启动后向 master 发送 sync 请求，等待建立成功后，slave 删除自己的数据日志文件，等待主节点同步；
+2. master 收到请求后触发一次 **RDB 全量备份**，同时收集期间接收到的写指令，将 RDB + 指令全量同步给 slave，完成首次全量同步；
+3. 主从关系建立后，master 定期向 slave 发送心跳包确认状态（`repl-ping-replica-period`，默认 10 秒）；
+4. slave 定期回复心跳，master 持续将后续写指令增量传递给 slave，并记录 offset（已同步给 slave 的消息偏移量）；
+5. slave 短暂失联时 master 停止同步；slave 重新上线后，master 从 offset 处继续增量同步。
+
+**主从同步缺点：**
+
+- **复制延迟**：所有写操作先在 master 执行再异步同步，系统繁忙或 slave 数量增加时延迟更严重；
+- **master 高可用问题**：master 挂了不会自动重选，只能人工干预（这正是哨兵要解决的问题）；
+- 从数据安全角度：主从复制**牺牲了服务高可用，但增加了数据安全**。
+
+### 6.4 哨兵集群：自动故障转移（数据安全②）
+
+> 部署细节见 2.4 节。Sentinel 不负责数据读写，专门为主从复制提供高可用能力，主要作用有四个：**主从监控、消息通知、故障转移、配置中心**。
+
+![1792367938409](Redis.assets/1792367938409.png)
+
+Redis的Sentinel不负责数据读写，主要就是给Redis的Replica主从复制提供高可用功能。主要作用有四个：
+
+- 主从监控：监控主从Redis运行是否正常
+- 消息通知：将故障转移的结果发送给客户端
+- 故障转移：如果master异常，则会进行主从切换。将其中一个slave切换成为master。
+- 配置中心：客户端通过连接哨兵可以获取当前Redis服务的master地址。
+
+从数据安全角度重新理解哨兵：
+
+**1）如何发现 master 宕机 —— S_DOWN 与 O_DOWN**
+
+- **主观下线 S_DOWN**：单个 sentinel 在 `down-after-milliseconds`（默认 30 秒）内未收到 master 心跳响应，主观认为 master 下线；
+- **客观下线 O_DOWN**：为防止网络抖动造成误判，sentinel 之间互相沟通，当超过 **quorum** 个 sentinel 都认为 master 已 S_DOWN 后，才真正判定 master 宕机，开始故障转移；
+- 因此建议 sentinel 部署**奇数个**节点、quorum 配置为**过半数**，最大化集群可用性。
+
+**2）发现宕机后如何切换 —— Raft 选举 + 从节点筛选**
+
+![sentinel_failover_log](Redis.assets/sentinel_failover_log.png)
+
+1. master 变成 O_DOWN 后，sentinel 集群基于 **Raft 算法**选举一个 Leader 协调切换（超过半数节点同意即通过——这也是 quorum 要设过半数的原因）；
+2. 在健康 slave 中选出新 master，规则依次为：`replica-priority` 优先级最低（默认 100）→ 复制偏移量 offset 最大（数据最全）→ RunID 字典序最小；
+3. Leader 给新 master 执行 `slaveof no one` 提升为主节点，并通知其他 slave 指向新 master；
+4. 旧 master 恢复后自动降级为 slave，从新 master 同步数据，恢复工作。
+
+**数据安全弱点：** 在主从复制集群中，无论 master 是谁，所有数据都以 master 为准。**master 宕机时，那些已完成但尚未同步给 slave 的写操作会彻底丢失**——切换完成后，所有数据以新 master 为准。因此企业实际应用中，用得更多的是下面的 Redis 集群。
+
+### 6.5 Redis 集群：分片 + 高可用（数据安全③）
+
+> 部署细节见 2.5 节。一句话总结：**将多组 Redis 主从复制集整合到一起，像一个 Redis 服务一样对外提供服务**。Cluster 的核心依然是 Replica 复制集。
+
+![cluster_arch](Redis.assets/cluster_arch.png)
+
+**集群要解决的三个核心问题：**
+
+1. 客户端需要频繁切换 master 的问题；
+2. 服务端数据量太大、单个复制集难以承担的问题；
+3. master 挂了之后，主动将 slave 切换成 master、保证服务稳定。
+
+#### 7.5.1 Slot 槽位与数据分布
+
+- 集群内置 **16384 个哈希槽**，每个 key 通过 `CRC16(key) mod 16384` 决定所属槽位，每个节点负责部分槽位；
+- **数据迁移**：集群节点增减时需要触发 `reshard` 重新分配槽位，且只需迁移对应槽位的数据；
+- **完整覆盖**：如果负责某段槽位的一组复制节点全部挂掉，默认整个集群停止服务（`cluster-require-full-coverage yes`）；强行设为 `no` 可让剩余节点继续服务，但意味着数据服务不完整，**通常不建议**；
+- **CROSSSLOT 限制**：批量复合指令（如 `mset`）要求所有 key 在同一槽位，否则报错：
+
+```shell
+127.0.0.1:6381> mset k1 v1 k2 v2 k3 v3
+(error) CROSSSLOT Keys in request don't hash to the same slot
+```
+
+> 这也是对分布式事务的一种思考：批量指令若分散到不同节点，原子性问题就升级为分布式事务问题，非常复杂；大部分业务场景下直接拒绝分布式事务，是很好的策略。
+
+- **hashtag 强制同槽**：key 中包含 `{}` 时，只按大括号内的内容计算槽位，可让相关 key 落在同一节点：
+
+```shell
+127.0.0.1:6381> CLUSTER KEYSLOT k1
+(integer) 12706
+127.0.0.1:6381> CLUSTER KEYSLOT roy{k1}
+(integer) 12706
+127.0.0.1:6381> mset user_{1}_name roy user_{1}_id 1 user_{1}_password 123
+-> Redirected to slot [9842] located at 192.168.65.214:6382
+OK
+```
+
+- **数据倾斜**：大型集群常出现热点 key 集中到某一节点、导致负载明显不均的资源浪费。调整思路分两步：① 调整 key 结构，让热点 key 尽量平均分配到各个 slot；② 调整 slot 分布，把数据量大、访问频繁的热点 slot 重新调配到不同节点。
+
+#### 7.5.2 gossip 协议与集群通信
+
+Redis 集群节点之间通过 **gossip 协议**频繁通信，用于传递消息和更新节点状态，是去中心化的：
+
+![gossip_arch](Redis.assets/gossip_arch.png)
+
+| 消息 | 作用 |
+| --- | --- |
+| `meet` | 让新节点加入集群，随后新节点开始与其他节点通信 |
+| `ping` | 频繁发送，携带自身状态与集群元数据（节点增删、hash slot 信息等） |
+| `pong` | 对 ping/meet 的应答，也可用于信息广播和更新 |
+| `fail` | 某节点判断另一节点宕机后广播通知其他节点 |
+
+- gossip 协议更新元数据**不是同时同步**，而是陆续传播到所有节点，因此数据统一**有一定延迟**；
+- 好处：节点增多时每个节点的负载增加很少（几乎恒定），适合构建较大集群；但数据同步延迟也会随节点增多而增加，对 Redis 不合适，**不建议构建太大的集群**；
+- 每个节点还有一个 `服务端口 + 10000` 的专用端口用于 gossip 通信，**部署集群时注意防火墙不要屏蔽该端口**。
+
+#### 7.5.3 集群选举原理
+
+当 slave 发现自己的 master 变为 FAIL 状态时，会尝试 Failover 竞选新 master。由于挂掉的 master 可能有多个 slave，存在多个 slave 竞争的过程：
+
+1. slave 发现 master 变为 FAIL；
+2. 将自己记录的 currentEpoch 加 1，广播 `FAILOVER_AUTH_REQUEST`（currentEpoch 即选举周期，可通过 `cluster info` 查看）；
+3. 其他节点收到后**只有 master 响应**，判断请求者合法性并发送 `FAILOVER_AUTH_ACK`（每个 epoch 只发一次 ack）；
+4. 竞选 slave 收集各 master 返回的 ack；
+5. **收到超过半数 master 的 ack 后成为新 master**——这就是集群为什么至少需要 3 个主节点：如果只有 2 个主节点，其中一个挂了，剩余 1 个主节点无法凑够半数，选举失败；
+6. slave 广播 Pong 消息通知其他集群节点。
+
+从节点并不是一发现 FAIL 就立刻发起选举，而是延迟一段时间，确保 FAIL 状态已在集群中传播（否则其他 master 可能尚未意识到 FAIL、拒绝投票）：
+
+```text
+DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms
+```
+
+其中 `SLAVE_RANK` 表示该 slave 已从 master 复制的数据量排名，**Rank 越小代表已复制的数据越新**，理论上持有最新数据的 slave 会最先发起选举。
+
+#### 7.5.4 集群能否保证数据安全？
+
+**相对稳定运行时，Redis 集群可以保证数据安全**：每个 master 都可配置 slave 从节点实时备份，master 宕机时 slave 自动切换成 master 继续提供服务。
+
+还可以用两个参数强制保证每个 master 必须有健康的 slave：
+
+```conf
+# 至少连接 N 个副本、且延迟不超过 M 秒时，master 才接受写入（默认关闭）
+min-replicas-to-write 3
+min-replicas-max-lag 10
+```
+
+但**不保证强一致性**：由于 gossip 协议同步元数据时不保证强一致，在特定的苛刻条件下（概率较小），如网络抖动产生的**脑裂**问题，集群可能会丢失少量已被系统收到的写请求。
+
+> 在企业中有良好运维支持时，通常可以认为 Redis 集群的数据是安全的。
+
+### 6.6 数据安全性方案总结
+
+从数据安全角度梳理 Redis 从单机到集群的部署架构：
+
+| 方案 | 数据冗余 | 自动故障转移 | 数据分片 | 数据安全定位 |
+| --- | --- | --- | --- | --- |
+| 单机 + 持久化 | ❌ | ❌ | ❌ | 保证单机数据不丢；磁盘损坏则无解 |
+| 主从复制 | ✅ 热备份 | ❌ 需人工 | ❌ | 数据冗余 + 容灾，牺牲高可用换数据安全 |
+| 哨兵集群 | ✅ | ✅ | ❌ | 自动故障转移；未同步数据可能丢失 |
+| Redis 集群 | ✅ 每主带从 | ✅ | ✅ 16384 槽 | 分片 + 高可用；特殊条件下可能丢少量写请求 |
+
+**总结：**
+
+1. 持久化是数据安全的地基，**RDB 定期备份 + AOF 实时追加（混合持久化）**是最佳组合；
+2. 分布式架构层层递进：主从解决数据冗余 → 哨兵解决自动故障转移 → 集群解决容量与稳定性，每一层都从不同角度提升数据安全；
+3. Redis 的数据保存策略在很多场景下堪称"教科书级"解决方案；企业版（Redis Enterprise）在业务功能层面并未做太多加法，核心就是**服务高可用与数据安全**方面的全面增强；
+4. 不过基于内存与硬盘的成本对比，**Redis 通常仍不建议作为独立数据库使用**，大部分场景还是发挥高性能优势作为缓存；如果有非常靠谱的运维支撑，Redis 作为数据库（如 Redis Cloud 实例）也完全可行。
+
+## 9. Redisson
 
 Redisson 是架设在 Redis 之上的 Java 驻内存数据网格（In-Memory Data Grid），提供了比 RedisTemplate 更丰富的分布式能力：**分布式锁**（可重入锁、公平锁、读写锁、RedLock）、分布式集合（Map/Set/Queue）、限流器（RRateLimiter）、延迟队列、布隆过滤器、分布式对象等。最常用的场景是**分布式锁**——内置看门狗（Watchdog）机制，在锁即将到期且业务未执行完时自动续期，避免锁提前过期。
 
@@ -2010,7 +2857,7 @@ spring:
         transportMode: "NIO"
 ```
 
-## 7. 参考资料
+## 10. 参考资料
 
 - [Redis 官方网站](https://redis.io/)
 - [Redis 官方命令文档](https://redis.io/docs/latest/commands/)
